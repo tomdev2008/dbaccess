@@ -1,0 +1,125 @@
+package com.dajie.core.dbaccess;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.List;
+
+public class DataAccessManager {
+
+    private static DataAccessManager instance;
+
+    private DataAccessManager() {
+
+    }
+
+    public static DataAccessManager getInstance() {
+        if (instance == null) {
+            synchronized (DataAccessManager.class) {
+                instance = new DataAccessManager();
+            }
+        }
+        return instance;
+    }
+
+    private void closeResultSet(ResultSet rs) {
+        try {
+            if (rs != null) {
+                rs.close();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void closeStatement(Statement st) {
+        try {
+            if (st != null) {
+                st.close();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void closeConnection(Connection conn) {
+        try {
+            if (conn != null) {
+                conn.close();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public <T> List<T> querList(final OpList<T> op) throws SQLException {
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        Connection conn = null;
+        try {
+            conn = getConnection();
+            System.out.println("conn:" + conn.toString());
+            ps = conn.prepareStatement(op.getSql());
+            System.out.println("ps:" + ps.toString());
+            op.setParam(ps);
+            rs = ps.executeQuery();
+            System.out.println("rs:" + rs.toString());
+            while (rs.next()) {
+                op.add(op.parse(rs));
+            }
+        } finally {
+            closeResultSet(rs);
+            closeStatement(ps);
+            closeConnection(conn);
+        }
+        return op.getResult();
+    }
+
+    static Connection getConnection() {
+        try {
+            Class.forName("com.mysql.jdbc.Driver");
+            String url = "jdbc:mysql://localhost:3309/test?useunicode=true&characterencoding=utf8";
+            String user = "root";
+            String password = "12345";
+            return DriverManager.getConnection(url);
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        } catch (SQLException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public static void main(String[] args) {
+        OpList<Person> op = new OpList<Person>("SELECT * FROM PERSON", "PERSON") {
+
+            @Override
+            public void setParam(PreparedStatement ps) throws SQLException {
+
+            }
+
+            @Override
+            public Person parse(ResultSet rs) throws SQLException {
+                Person person = new Person();
+                person.setId(rs.getInt("id"));
+                person.setName(rs.getString("name"));
+                return person;
+            }
+        };
+
+        try {
+            List<Person> value = DataAccessManager.getInstance().querList(op);
+            System.out.println(value);
+        } catch (SQLException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        System.out.println("done...");
+        System.exit(0);
+    }
+
+}
