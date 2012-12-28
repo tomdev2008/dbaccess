@@ -78,7 +78,7 @@ public class DataAccessManager {
         return op.getResult();
     }
 
-    static Connection getConnection() {
+    private Connection getConnection() {
         try {
             Class.forName("com.mysql.jdbc.Driver");
             String url = "jdbc:mysql://localhost:3309/test?useunicode=true&characterencoding=utf8";
@@ -94,32 +94,6 @@ public class DataAccessManager {
         return null;
     }
 
-    public static void main(String[] args) {
-        OpList<Person> op = new OpList<Person>("SELECT * FROM PERSON", "PERSON") {
-
-            @Override
-            public void setParam(PreparedStatement ps) throws SQLException {
-
-            }
-
-            @Override
-            public Person parse(ResultSet rs) throws SQLException {
-                Person person = new Person();
-                person.setId(rs.getInt("id"));
-                person.setName(rs.getString("name"));
-                return person;
-            }
-        };
-
-        try {
-            List<Person> value = DataAccessManager.getInstance().querList(op);
-            System.out.println(value);
-        } catch (SQLException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-        System.out.println("done...");
-        System.exit(0);
-    }
+  
 
 }

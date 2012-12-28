@@ -31,24 +31,4 @@ public abstract class OpList<T> extends Operation<T> {
     public List<T> getResult() {
         return collection;
     }
-
-    
-    public static void main(String[] args) {
-        OpList<Person> list = new OpList<Person>("bc", "ff") {
-
-            @Override
-            public void setParam(PreparedStatement ps) throws SQLException {
-                // TODO Auto-generated method stub
-                
-            }
-
-            @Override
-            public Person parse(ResultSet rs) throws SQLException {
-                // TODO Auto-generated method stub
-                return null;
-            }
-            
-        };
-    }
-
 }

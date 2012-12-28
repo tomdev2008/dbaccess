@@ -1,4 +1,4 @@
-package com.dajie.core.dbaccess;
+package com.dajie.core.dbaccess.demo;
 
 public class Person {
 
