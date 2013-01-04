@@ -3,22 +3,26 @@ package com.dajie.core.dbaccess;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.List;
+import java.util.Random;
 
 import junit.framework.TestCase;
 
 import org.junit.Test;
 
+public class TestOpUnique extends TestCase {
 
-public class TestOpList extends TestCase {
+	private static Random rand = new Random(System.currentTimeMillis());
 
 	@Test
-	public void testSelectAllFromDB() {
-		OpList<Person> op = new OpList<Person>("SELECT * FROM PERSON", "PERSON") {
+	public void testSelectOneFromDB() {
+		final int userId = rand.nextInt(100) % 8;
+
+		OpUnique<Person> opUnique = new OpUnique<Person>(
+				"SELECT * FROM PERSON WHERE id = ?", "PERSON") {
 
 			@Override
 			public void setParam(PreparedStatement ps) throws SQLException {
-
+				ps.setInt(1, userId);
 			}
 
 			@Override
@@ -28,11 +32,12 @@ public class TestOpList extends TestCase {
 				person.setName(rs.getString("name"));
 				return person;
 			}
+
 		};
 
 		try {
-			List<Person> value = DataAccessManager.getInstance().queryList(op);
-			System.out.println(value);
+			Person p = DataAccessManager.getInstance().queryUnique(opUnique);
+			System.out.println(p);
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}

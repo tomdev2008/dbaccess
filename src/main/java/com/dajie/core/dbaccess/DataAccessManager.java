@@ -60,7 +60,7 @@ public class DataAccessManager {
 		}
 	}
 
-	public <T> List<T> querList(final OpList<T> op) throws SQLException {
+	public <T> List<T> queryList(final OpList<T> op) throws SQLException {
 		PreparedStatement ps = null;
 		ResultSet rs = null;
 		Connection conn = null;
@@ -75,6 +75,32 @@ public class DataAccessManager {
 			while (rs.next()) {
 				op.add(op.parse(rs));
 			}
+		} finally {
+			closeResultSet(rs);
+			closeStatement(ps);
+			closeConnection(conn);
+		}
+		return op.getResult();
+	}
+
+	public <T> T queryUnique(final OpUnique<T> op) throws SQLException {
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+		Connection conn = null;
+		try {
+			conn = getConnection();
+			System.out.println("conn:" + conn.toString());
+			ps = conn.prepareStatement(op.getSql());
+			System.out.println("before setParam ps:" + ps.toString());
+			op.setParam(ps);
+			System.out.println("after setParam  ps:" + ps.toString());
+			rs = ps.executeQuery();
+			System.out.println("rs:" + rs.toString());
+			if (rs.next()) {
+				T result = op.parse(rs);
+				op.setResult(result);
+			}
+
 		} finally {
 			closeResultSet(rs);
 			closeStatement(ps);
