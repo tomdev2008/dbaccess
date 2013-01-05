@@ -7,6 +7,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 
@@ -101,6 +102,30 @@ public class DataAccessManager {
 				op.setResult(result);
 			}
 
+		} finally {
+			closeResultSet(rs);
+			closeStatement(ps);
+			closeConnection(conn);
+		}
+		return op.getResult();
+	}
+
+	public <K, T> Map<K, T> queryMap(final OpMap<K, T> op) throws SQLException {
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+		Connection conn = null;
+		try {
+			conn = getConnection();
+			System.out.println("conn:" + conn.toString());
+			ps = conn.prepareStatement(op.getSql());
+			System.out.println("before setParam ps:" + ps.toString());
+			op.setParam(ps);
+			System.out.println("after setParam  ps:" + ps.toString());
+			rs = ps.executeQuery();
+			System.out.println("rs:" + rs.toString());
+			while (rs.next()) {
+				op.parse(rs);
+			}
 		} finally {
 			closeResultSet(rs);
 			closeStatement(ps);
