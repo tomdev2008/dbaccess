@@ -67,12 +67,9 @@ public class DataAccessManager {
 		Connection conn = null;
 		try {
 			conn = getConnection();
-			System.out.println("conn:" + conn.toString());
 			ps = conn.prepareStatement(op.getSql());
-			System.out.println("ps:" + ps.toString());
 			op.setParam(ps);
 			rs = ps.executeQuery();
-			System.out.println("rs:" + rs.toString());
 			while (rs.next()) {
 				op.add(op.parse(rs));
 			}
@@ -90,13 +87,9 @@ public class DataAccessManager {
 		Connection conn = null;
 		try {
 			conn = getConnection();
-			System.out.println("conn:" + conn.toString());
 			ps = conn.prepareStatement(op.getSql());
-			System.out.println("before setParam ps:" + ps.toString());
 			op.setParam(ps);
-			System.out.println("after setParam  ps:" + ps.toString());
 			rs = ps.executeQuery();
-			System.out.println("rs:" + rs.toString());
 			if (rs.next()) {
 				T result = op.parse(rs);
 				op.setResult(result);
@@ -116,13 +109,9 @@ public class DataAccessManager {
 		Connection conn = null;
 		try {
 			conn = getConnection();
-			System.out.println("conn:" + conn.toString());
 			ps = conn.prepareStatement(op.getSql());
-			System.out.println("before setParam ps:" + ps.toString());
 			op.setParam(ps);
-			System.out.println("after setParam  ps:" + ps.toString());
 			rs = ps.executeQuery();
-			System.out.println("rs:" + rs.toString());
 			while (rs.next()) {
 				op.parse(rs);
 			}
@@ -134,12 +123,58 @@ public class DataAccessManager {
 		return op.getResult();
 	}
 
+	public boolean update(final OpUpdate op) throws SQLException {
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+		Connection conn = null;
+		try {
+			conn = getConnection();
+			ps = conn.prepareStatement(op.getSql());
+			op.setParam(ps);
+			int rows = ps.executeUpdate();
+			op.setResult(rows);
+		} finally {
+			closeResultSet(rs);
+			closeStatement(ps);
+			closeConnection(conn);
+		}
+		return (op.getResult() > 0 ? true : false);
+	}
+
+	public int insertAndReturnId(final OpUpdate op) throws SQLException {
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+		Connection conn = null;
+		try {
+			conn = getConnection();
+			ps = conn.prepareStatement(op.getSql());
+			op.setParam(ps);
+			int rows = ps.executeUpdate();
+			if (rows > 0) {
+				if (ps != null) {
+					ps.close();
+				}
+				ps = conn.prepareStatement("SELECT LAST_INSERT_ID();");
+				rs = ps.executeQuery();
+				if (rs.next()) {
+					return rs.getInt(1);
+				}
+			}
+
+		} finally {
+			closeResultSet(rs);
+			closeStatement(ps);
+			closeConnection(conn);
+		}
+		return -1;
+	}
+
 	private Connection getConnection() {
 		try {
 			Class.forName("com.mysql.jdbc.Driver");
-			String databaseHost = "192.168.9.204";
+			String databaseHost = "localhost";
 			String url = "jdbc:mysql://" + databaseHost
-					+ ":3309/test?useunicode=true&characterencoding=utf8";
+					+ ":3306/test?useunicode=true&characterencoding=utf8"; //
 			String user = "root";
 			String password = "12345";
 			return DriverManager.getConnection(url, user, password);
