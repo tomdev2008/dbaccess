@@ -6,18 +6,22 @@ import java.sql.SQLException;
 
 /**
  * 
- * @author liyong
- * 
+ * @author yong.li@dajie-inc.com
+ *
+ * @param <T>
  */
 public abstract class Operation<T> {
 
     private String bizName;
 
-    private String tableName;
 
     private int tableSuffix = -1;
 
     private String sql;
+    
+    public boolean isRouter() {
+    	return tableSuffix > -1;
+    }
 
     public String getBizName() {
         return bizName;
@@ -25,14 +29,6 @@ public abstract class Operation<T> {
 
     public void setBizName(String bizName) {
         this.bizName = bizName;
-    }
-
-    public String getTableName() {
-        return tableName;
-    }
-
-    public void setTableName(String tableName) {
-        this.tableName = tableName;
     }
 
     public int getTableSuffix() {

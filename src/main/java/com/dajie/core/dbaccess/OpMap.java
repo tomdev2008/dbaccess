@@ -3,6 +3,13 @@ package com.dajie.core.dbaccess;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * 
+ * @author yong.li@dajie-inc.com
+ *
+ * @param <K>
+ * @param <T>
+ */
 public abstract class OpMap<K, T> extends Operation<T> {
 
 	private Map<K, T> result;

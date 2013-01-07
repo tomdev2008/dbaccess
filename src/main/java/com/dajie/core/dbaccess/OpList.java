@@ -3,6 +3,13 @@ package com.dajie.core.dbaccess;
 import java.util.ArrayList;
 import java.util.List;
 
+
+/**
+ * 
+ * @author yong.li@dajie-inc.com
+ *
+ * @param <T>
+ */
 public abstract class OpList<T> extends Operation<T> {
 
 	private List<T> collection;

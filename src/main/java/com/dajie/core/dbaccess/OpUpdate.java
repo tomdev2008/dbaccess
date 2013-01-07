@@ -1,9 +1,10 @@
 package com.dajie.core.dbaccess;
 
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-
+/**
+ * 
+ * @author yong.li@dajie-inc.com
+ * 
+ */
 public abstract class OpUpdate extends Operation<Integer> {
 
 	private int result;
