@@ -84,6 +84,31 @@ public class ZkManager {
 		}
 		return version;
 	}
+	
+	/**
+	 * 取数据
+	 * 
+	 * @param znodePath
+	 * @return
+	 */
+	public String getData(String znodePath, boolean watch) {
+		String version = "";
+		synchronized (watcher) {
+			try {
+				byte[] rawData = getZk().getData(znodePath, watch, null);
+				if (rawData != null && rawData.length != 0) {
+					version = new String(rawData);
+				}
+			} catch (KeeperException e) {
+				logger.error("ZkManager.getData() znodePath:" + znodePath
+						+ "\t" + e.toString());
+			} catch (InterruptedException e) {
+				logger.error("ZkManager.getData() znodePath:" + znodePath
+						+ "\t" + e.toString());
+			}
+		}
+		return version;
+	}
 
 	/**
 	 * 为了重新注册watcher用
