@@ -141,9 +141,7 @@ public class DatabaseConfig extends ZNodeListener implements ConnectionAccess {
 			ds.setUrl(getConnectionUrl());
 			ds.setInitialSize(this.coreSize);
 			ds.setMaxActive(maxSize);
-			int doubleCoreSize = coreSize * 2;
-			int maxIdle = (doubleCoreSize < maxSize ? doubleCoreSize : maxSize);
-			ds.setMaxIdle(maxIdle);
+			ds.setMaxIdle(coreSize);
 			ds.setMaxWait(1000L);
 			this.dataSource = ds;
 		}
