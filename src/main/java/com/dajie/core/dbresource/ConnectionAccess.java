@@ -7,7 +7,7 @@ import java.sql.Connection;
  * @author yong.li@dajie-inc.com
  *
  */
-public interface DatabaseResource {
+public interface ConnectionAccess {
 
 	public Connection getReadConnection(String pattern);
 	

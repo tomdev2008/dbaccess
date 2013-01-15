@@ -169,7 +169,7 @@ public class DataAccessManager {
 		return -1;
 	}
 
-	private Connection getConnection() {
+	public Connection getConnection() {
 		try {
 			Class.forName("com.mysql.jdbc.Driver");
 			String databaseHost = "localhost";
@@ -185,6 +185,16 @@ public class DataAccessManager {
 			e.printStackTrace();
 		}
 		return null;
+	}
+
+	public static void main(String[] args) throws Exception {
+		Connection conn = DataAccessManager.getInstance().getConnection();
+		Statement stmt = conn.createStatement();
+		ResultSet rs = stmt.executeQuery("SELECT * FROM PERSON LIMIT 100");
+		while (rs.next())
+			System.out.println(rs.getRow());
+
+		System.exit(0);
 	}
 
 }

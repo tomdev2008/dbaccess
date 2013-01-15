@@ -3,18 +3,18 @@
   "name" : "user",
   "type" : "single",
   "nodes" : [
-    {"host" : "a1.d.dajie.com", "port" : 3307, "user" : "Geeker2010", "password" : "GeekerPwd", "flag" : "W", "core_size" : 10, "max_size" : 100},
-    {"host" : "a2.d.dajie.com", "port" : 3307, "user" : "Geeker2010", "password" : "GeekerPwd", "flag" : "R", "core_size" : 10, "max_size" : 100},
+    {"host" : "a1.d.dajie.com", "port" : 3307, "user" : "Geeker2010", "password" : "GeekerPwd", "flag" : "W", "db_name":"test" , "core_size" : 10, "max_size" : 100},
+    {"host" : "a2.d.dajie.com", "port" : 3307, "user" : "Geeker2010", "password" : "GeekerPwd", "flag" : "R", "db_name":"test" , "core_size" : 10, "max_size" : 100},
   ],
 },
 {
   "name" : "buddy",
   "type" : "router", 
   "nodes" : [
-    {"pattern" : "[a-zA-Z]*_[0-4][0-9]", "host" : "b1.d.dajie.com", "port" : 3307, "user" : "Geeker2010", "password" : "GeekerPwd", "flag" : "W", "core_size" : 10, "max_size" : 100},
-    {"pattern" : "[a-zA-Z]*_[5-9][0-9]", "host" : "b1.d.dajie.com", "port" : 3307, "user" : "Geeker2010", "password" : "GeekerPwd", "flag" : "W", "core_size" : 10, "max_size" : 100},
-    {"pattern" : "[a-zA-Z]*_[0-4][0-9]", "host" : "b2.d.dajie.com", "port" : 3307, "user" : "Geeker2010", "password" : "GeekerPwd", "flag" : "R", "core_size" : 10, "max_size" : 100},
-    {"pattern" : "[a-zA-Z]*_[5-9][0-9]", "host" : "b2.d.dajie.com", "port" : 3307, "user" : "Geeker2010", "password" : "GeekerPwd", "flag" : "R", "core_size" : 10, "max_size" : 100},
+    {"pattern" : "[a-zA-Z]*_[0-4][0-9]", "host" : "b1.d.dajie.com", "port" : 3307, "user" : "Geeker2010", "password" : "GeekerPwd", "flag" : "W", "db_name":"test" , "core_size" : 10, "max_size" : 100},
+    {"pattern" : "[a-zA-Z]*_[5-9][0-9]", "host" : "b1.d.dajie.com", "port" : 3307, "user" : "Geeker2010", "password" : "GeekerPwd", "flag" : "W", "db_name":"test" , "core_size" : 10, "max_size" : 100},
+    {"pattern" : "[a-zA-Z]*_[0-4][0-9]", "host" : "b2.d.dajie.com", "port" : 3307, "user" : "Geeker2010", "password" : "GeekerPwd", "flag" : "R", "db_name":"test" ,"core_size" : 10, "max_size" : 100},
+    {"pattern" : "[a-zA-Z]*_[5-9][0-9]", "host" : "b2.d.dajie.com", "port" : 3307, "user" : "Geeker2010", "password" : "GeekerPwd", "flag" : "R", "db_name":"test" ,"core_size" : 10, "max_size" : 100},
   ]
 },
 ] 

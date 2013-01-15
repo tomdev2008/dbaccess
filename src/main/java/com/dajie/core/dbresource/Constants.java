@@ -16,6 +16,7 @@ public interface Constants {
 	public static final String USER = "user";
 	public static final String PASSWORD = "password";
 	public static final String FLAG = "flag";
+	public static final String DB_NAME = "db_name";
 	
 	public static final String CORE_SIZE = "core_size";
 	public static final String MAX_SIZE = "max_size";
