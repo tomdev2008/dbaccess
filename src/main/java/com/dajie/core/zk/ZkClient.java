@@ -9,6 +9,8 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import com.dajie.core.dbresource.Constants;
+
 
 /**
  * 
@@ -39,10 +41,14 @@ public class ZkClient {
 //	private Map<String, String> znodeVersionMap;
 //
 //	private Object znodeVersionLock;
-
+	
 	private ZkClient(String zkAddress) throws ZookeeperException {
 		this.zkAddress = zkAddress;
 		initialize();
+	}
+	
+	public static ZkClient getInstance() throws ZookeeperException {
+		return getInstance(Constants.ZK_ADDRESS);
 	}
 
 	public static ZkClient getInstance(String zkAddress)

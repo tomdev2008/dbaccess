@@ -47,6 +47,15 @@ public abstract class Operation<T> {
         this.sql = sql;
     }
     
+    public String getPattern() {
+    	StringBuffer sb = new StringBuffer();
+    	sb.append(bizName);
+    	if (tableSuffix >= 0) {
+    		sb.append("_").append(tableSuffix);
+    	}
+    	return sb.toString();
+    }
+    
     public abstract void setParam(PreparedStatement ps) throws SQLException;
     public abstract T parse(ResultSet rs) throws SQLException;
 }
