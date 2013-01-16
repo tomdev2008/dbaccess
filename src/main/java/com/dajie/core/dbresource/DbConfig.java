@@ -210,6 +210,7 @@ public class DbConfig extends ZNodeListener implements ConnectionAccess {
 			ds.setMaxActive(maxSize);
 			ds.setMaxIdle(coreSize);
 			ds.setMaxWait(1000L);
+			ds.addConnectionProperty("connectTimeout", "1000");
 			this.dataSource = ds;
 		}
 
