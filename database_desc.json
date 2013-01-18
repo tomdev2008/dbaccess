@@ -1,20 +1,20 @@
 [
 {
-  "name" : "user",
-  "type" : "single",
-  "nodes" : [
-    {"host" : "localhost", "port" : 3306, "user" : "root", "password" : "12345", "flag" : "W", "db_name":"test" , "core_size" : 10, "max_size" : 100},
-    {"host" : "localhost", "port" : 3306, "user" : "root", "password" : "12345", "flag" : "R", "db_name":"test" , "core_size" : 10, "max_size" : 100},
+  "name":"user",
+  "type":"single",
+  "nodes":[
+    {"host":"localhost","port":3306,"user":"root","password":"12345","flag":"W","db_name":"test","core_size":10,"max_size":100},
+    {"host":"localhost","port":3306,"user":"root","password":"12345","flag":"R","db_name":"test","core_size":10,"max_size":100},
   ],
 },
 {
-  "name" : "buddy",
-  "type" : "router", 
-  "nodes" : [
-    {"pattern" : "[a-zA-Z]*_[0-4][0-9]", "host" : "localhost", "port" : 3306, "user" : "root", "password" : "12345", "flag" : "W", "db_name":"test" , "core_size" : 10, "max_size" : 100},
-    {"pattern" : "[a-zA-Z]*_[5-9][0-9]", "host" : "localhost", "port" : 3306, "user" : "root", "password" : "12345", "flag" : "W", "db_name":"test" , "core_size" : 10, "max_size" : 100},
-    {"pattern" : "[a-zA-Z]*_[0-4][0-9]", "host" : "localhost", "port" : 3306, "user" : "root", "password" : "12345", "flag" : "R", "db_name":"test" ,"core_size" : 10, "max_size" : 100},
-    {"pattern" : "[a-zA-Z]*_[5-9][0-9]", "host" : "localhost", "port" : 3306, "user" : "root", "password" : "12345", "flag" : "R", "db_name":"test" ,"core_size" : 10, "max_size" : 100},
+  "name":"buddy",
+  "type":"router",
+  "nodes":[
+    {"pattern":"[a-zA-Z]*_[0-4][0-9]","host":"localhost","port":3306,"user":"root","password":"12345","flag":"W","db_name":"test","core_size":10,"max_size":100},
+    {"pattern":"[a-zA-Z]*_[5-9][0-9]","host":"localhost","port":3306,"user":"root","password":"12345","flag":"W","db_name":"test","core_size":10,"max_size":100},
+    {"pattern":"[a-zA-Z]*_[0-4][0-9]","host":"localhost","port":3306,"user":"root","password":"12345","flag":"R","db_name":"test" ,"core_size":10,"max_size":100},
+    {"pattern":"[a-zA-Z]*_[5-9][0-9]","host":"localhost","port":3306,"user":"root","password":"12345","flag":"R","db_name":"test" ,"core_size":10,"max_size":100},
   ]
 },
 ] 
