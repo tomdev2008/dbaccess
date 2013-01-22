@@ -24,13 +24,12 @@ public class TestConnection extends TestCase {
 	@Order(order = 1)
 	public void testGetReadConnection() {
 		System.out.println("testGetReadConnectioin");
-		String bizName = "user";
+		String bizName = "buddy";
 		try {
 			Connection readConn = DbConfigManager.getInstance()
-					.getConfig(bizName).getReadConnection();
-			Assert.assertNotNull(readConn);
+					.getConfig(bizName).getReadConnection("buddy_18");
 			System.out.println("readConn:" + readConn);
-
+			Assert.assertNotNull(readConn);
 		} catch (IllegalArgumentException e) {
 			e.printStackTrace();
 		} catch (Exception e) {

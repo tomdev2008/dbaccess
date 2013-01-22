@@ -9,6 +9,9 @@ import java.sql.Statement;
 import java.util.List;
 import java.util.Map;
 
+import com.dajie.core.dbresource.DbConfig;
+import com.dajie.core.dbresource.DbConfigManager;
+
 /**
  * 
  * @author yong.li@dajie-inc.com
@@ -61,12 +64,12 @@ public class DataAccessManager {
 		}
 	}
 
-	public <T> List<T> queryList(final OpList<T> op) throws SQLException {
+	public <T> List<T> queryList(final OpList<T> op) throws Exception {
 		PreparedStatement ps = null;
 		ResultSet rs = null;
 		Connection conn = null;
 		try {
-			conn = getConnection();
+			conn = getReadConnection(op);
 			ps = conn.prepareStatement(op.getSql());
 			op.setParam(ps);
 			rs = ps.executeQuery();
@@ -81,12 +84,13 @@ public class DataAccessManager {
 		return op.getResult();
 	}
 
-	public <T> T queryUnique(final OpUnique<T> op) throws SQLException {
+	public <T> T queryUnique(final OpUnique<T> op) throws Exception {
 		PreparedStatement ps = null;
 		ResultSet rs = null;
 		Connection conn = null;
 		try {
-			conn = getConnection();
+			conn = getReadConnection(op);
+			System.out.println("queryUnique(), conn:" + conn);
 			ps = conn.prepareStatement(op.getSql());
 			op.setParam(ps);
 			rs = ps.executeQuery();
@@ -103,12 +107,12 @@ public class DataAccessManager {
 		return op.getResult();
 	}
 
-	public <K, T> Map<K, T> queryMap(final OpMap<K, T> op) throws SQLException {
+	public <K, T> Map<K, T> queryMap(final OpMap<K, T> op) throws Exception {
 		PreparedStatement ps = null;
 		ResultSet rs = null;
 		Connection conn = null;
 		try {
-			conn = getConnection();
+			conn = getReadConnection(op);
 			ps = conn.prepareStatement(op.getSql());
 			op.setParam(ps);
 			rs = ps.executeQuery();
@@ -123,12 +127,12 @@ public class DataAccessManager {
 		return op.getResult();
 	}
 
-	public boolean update(final OpUpdate op) throws SQLException {
+	public boolean update(final OpUpdate op) throws Exception {
 		PreparedStatement ps = null;
 		ResultSet rs = null;
 		Connection conn = null;
 		try {
-			conn = getConnection();
+			conn = getWriteConnection(op);
 			ps = conn.prepareStatement(op.getSql());
 			op.setParam(ps);
 			int rows = ps.executeUpdate();
@@ -141,12 +145,12 @@ public class DataAccessManager {
 		return (op.getResult() > 0 ? true : false);
 	}
 
-	public int insertAndReturnId(final OpUpdate op) throws SQLException {
+	public int insertAndReturnId(final OpUpdate op) throws Exception {
 		PreparedStatement ps = null;
 		ResultSet rs = null;
 		Connection conn = null;
 		try {
-			conn = getConnection();
+			conn = getWriteConnection(op);
 			ps = conn.prepareStatement(op.getSql());
 			op.setParam(ps);
 			int rows = ps.executeUpdate();
@@ -169,32 +173,38 @@ public class DataAccessManager {
 		return -1;
 	}
 
-	public Connection getConnection() {
-		try {
-			Class.forName("com.mysql.jdbc.Driver");
-			String databaseHost = "localhost";
-			String url = "jdbc:mysql://" + databaseHost
-					+ ":3306/test?useunicode=true&characterencoding=utf8"; //
-			String user = "root";
-			String password = "12345";
-			return DriverManager.getConnection(url, user, password);
-		} catch (ClassNotFoundException e) {
-			e.printStackTrace();
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+	private <T> Connection getWriteConnection(Operation<T> op) throws Exception {
+		DbConfig dbConfig = DbConfigManager.getInstance().getConfig(
+				op.getBizName());
+		if (dbConfig == null) {
+			throw new NotAvailableConnectionException("biz:" + op.getBizName()
+					+ "\tpattern:" + op.getPattern());
 		}
-		return null;
+
+		if (op.isRouter()) {
+			return dbConfig.getWriteConnection(op.getPattern());
+		} else {
+			return dbConfig.getWriteConnection();
+		}
 	}
 
-	public static void main(String[] args) throws Exception {
-		Connection conn = DataAccessManager.getInstance().getConnection();
-		Statement stmt = conn.createStatement();
-		ResultSet rs = stmt.executeQuery("SELECT * FROM PERSON LIMIT 100");
-		while (rs.next())
-			System.out.println(rs.getRow());
-
-		System.exit(0);
+	private <T> Connection getReadConnection(Operation<T> op) throws Exception {
+		DbConfig dbConfig = DbConfigManager.getInstance().getConfig(
+				op.getBizName());
+		if (dbConfig == null) {
+			throw new NotAvailableConnectionException("biz:" + op.getBizName()
+					+ "\tpattern:" + op.getPattern());
+		}
+		Connection conn = null;
+		if (op.isRouter()) {
+			conn = dbConfig.getReadConnection(op.getPattern());
+		} else {
+			conn = dbConfig.getReadConnection();
+		}
+		if (conn == null) {
+			throw new NotAvailableConnectionException("biz:" + op.getBizName()
+					+ "\tpattern:" + op.getPattern());
+		}
+		return conn;
 	}
-
 }

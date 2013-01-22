@@ -14,7 +14,7 @@ public class TestOpMap extends TestCase {
 	@Test
 	public void testSelectMapFromDB() {
 		OpMap<Integer, Person> opMap = new OpMap<Integer, Person>(
-				"SELECT * FROM PERSON", "PERSON") {
+				"SELECT * FROM PERSON", "user") {
 
 			@Override
 			public void setParam(PreparedStatement ps) throws SQLException {
@@ -36,7 +36,7 @@ public class TestOpMap extends TestCase {
 			Map<Integer, Person> value = DataAccessManager.getInstance()
 					.queryMap(opMap);
 			System.out.println(value);
-		} catch (SQLException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 

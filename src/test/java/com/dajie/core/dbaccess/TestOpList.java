@@ -14,7 +14,7 @@ public class TestOpList extends TestCase {
 
 	@Test
 	public void testSelectAllFromDB() {
-		OpList<Person> op = new OpList<Person>("SELECT * FROM PERSON", "PERSON") {
+		OpList<Person> op = new OpList<Person>("SELECT * FROM PERSON", "user") {
 
 			@Override
 			public void setParam(PreparedStatement ps) throws SQLException {
@@ -33,7 +33,7 @@ public class TestOpList extends TestCase {
 		try {
 			List<Person> value = DataAccessManager.getInstance().queryList(op);
 			System.out.println(value);
-		} catch (SQLException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}

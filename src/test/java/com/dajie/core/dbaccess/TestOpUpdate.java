@@ -4,6 +4,8 @@ import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 import junit.framework.TestCase;
 
@@ -16,16 +18,18 @@ public class TestOpUpdate extends TestCase {
 
 	private static int INSERT_ID = -1;
 
+	private static String bizName = "user";
+
 	@Test
 	@Order(order = 1)
 	public void testInsertInto() {
 		String sql = "INSERT INTO PERSON(name, age, birth) values(?, ?, ?);";
-		String tableName = "PERSON";
-		OpUpdate op = new OpUpdate(sql, tableName) {
+		final String userName = UUID.randomUUID().toString();
+		OpUpdate op = new OpUpdate(sql, bizName) {
 
 			@Override
 			public void setParam(PreparedStatement ps) throws SQLException {
-				ps.setString(1, "张三");
+				ps.setString(1, userName);
 				ps.setInt(2, 18);
 				ps.setDate(3, new Date(System.currentTimeMillis()));
 			}
@@ -39,7 +43,7 @@ public class TestOpUpdate extends TestCase {
 			INSERT_ID = DataAccessManager.getInstance().insertAndReturnId(op);
 			System.out.println("INSERT_ID:" + INSERT_ID);
 			Assert.assertNotEquals(INSERT_ID, -1);
-		} catch (SQLException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
@@ -49,7 +53,7 @@ public class TestOpUpdate extends TestCase {
 	public void testGetLastInsert() {
 		Assert.assertNotEquals(INSERT_ID, -1);
 		OpUnique<Person> opUnique = new OpUnique<Person>(
-				"SELECT * FROM PERSON WHERE id = ?", "PERSON") {
+				"SELECT * FROM PERSON WHERE id = ?", bizName) {
 
 			@Override
 			public void setParam(PreparedStatement ps) throws SQLException {
@@ -70,7 +74,7 @@ public class TestOpUpdate extends TestCase {
 			Person p = DataAccessManager.getInstance().queryUnique(opUnique);
 			System.out.println(p);
 			Assert.assertNotNull(p);
-		} catch (SQLException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
@@ -78,10 +82,15 @@ public class TestOpUpdate extends TestCase {
 	@Test
 	@Order(order = 3)
 	public void testDeleteLastInsert() {
+		try {
+			TimeUnit.SECONDS.sleep(3);
+		} catch (InterruptedException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
 		Assert.assertNotEquals(INSERT_ID, -1);
 		String sql = "DELETE FROM PERSON WHERE id = ?";
-		String tableName = "PERSON";
-		OpUpdate op = new OpUpdate(sql, tableName) {
+		OpUpdate op = new OpUpdate(sql, bizName) {
 
 			@Override
 			public void setParam(PreparedStatement ps) throws SQLException {
@@ -96,7 +105,37 @@ public class TestOpUpdate extends TestCase {
 		try {
 			boolean result = DataAccessManager.getInstance().update(op);
 			Assert.assertTrue(result);
-		} catch (SQLException e) {
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+	@Test
+	@Order(order = 4)
+	public void testGetAfterDelete() {
+		Assert.assertNotEquals(INSERT_ID, -1);
+		OpUnique<Person> opUnique = new OpUnique<Person>(
+				"SELECT * FROM PERSON WHERE id = ?", bizName) {
+
+			@Override
+			public void setParam(PreparedStatement ps) throws SQLException {
+				ps.setInt(1, INSERT_ID);
+			}
+
+			@Override
+			public Person parse(ResultSet rs) throws SQLException {
+				Person person = new Person();
+				person.setId(rs.getInt("id"));
+				person.setName(rs.getString("name"));
+				return person;
+			}
+
+		};
+
+		try {
+			Person p = DataAccessManager.getInstance().queryUnique(opUnique);
+			Assert.assertNull(p);
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}

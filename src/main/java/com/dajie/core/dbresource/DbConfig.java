@@ -1,15 +1,11 @@
 package com.dajie.core.dbresource;
 
-import java.io.PrintWriter;
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.sql.SQLFeatureNotSupportedException;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
-import javax.sql.CommonDataSource;
 import javax.sql.DataSource;
 
 import org.apache.commons.dbcp.BasicDataSource;
