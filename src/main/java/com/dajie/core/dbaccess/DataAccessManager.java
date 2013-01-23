@@ -180,12 +180,17 @@ public class DataAccessManager {
 			throw new NotAvailableConnectionException("biz:" + op.getBizName()
 					+ "\tpattern:" + op.getPattern());
 		}
-
+		Connection conn = null;
 		if (op.isRouter()) {
-			return dbConfig.getWriteConnection(op.getPattern());
+			conn = dbConfig.getWriteConnection(op.getPattern());
 		} else {
-			return dbConfig.getWriteConnection();
+			conn = dbConfig.getWriteConnection();
 		}
+		if (conn == null) {
+			throw new NotAvailableConnectionException("biz:" + op.getBizName()
+					+ "\tpattern:" + op.getPattern());
+		}
+		return conn;
 	}
 
 	private <T> Connection getReadConnection(Operation<T> op) throws Exception {
