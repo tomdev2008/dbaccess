@@ -8,13 +8,13 @@ import java.util.regex.Pattern;
 
 import javax.sql.DataSource;
 
-import org.apache.commons.dbcp.BasicDataSource;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import com.dajie.core.zk.ZNodeListener;
 import com.dajie.core.zk.ZkClient;
 import com.dajie.core.zk.ZookeeperException;
+import com.jolbox.bonecp.BoneCPDataSource;
 
 /**
  * 
@@ -197,16 +197,25 @@ public class DbConfig extends ZNodeListener implements ConnectionAccess {
 		}
 
 		private void initDataSource() {
-			BasicDataSource ds = new BasicDataSource();
-			ds.setDriverClassName(MYSQL_DRIVER_CLASS);
-			ds.setUsername(this.user);
-			ds.setPassword(this.password);
-			ds.setUrl(getConnectionUrl());
-			ds.setInitialSize(this.coreSize);
-			ds.setMaxActive(maxSize);
-			ds.setMaxIdle(coreSize);
-			ds.setMaxWait(1000L);
-			ds.addConnectionProperty("connectTimeout", "1000");
+			BoneCPDataSource ds = new BoneCPDataSource();
+			ds.setDriverClass(MYSQL_DRIVER_CLASS);
+			ds.setUsername(user);
+			ds.setPassword(password);
+			ds.setJdbcUrl(getConnectionUrl());
+			ds.setMinConnectionsPerPartition(coreSize);
+			ds.setMaxConnectionsPerPartition(maxSize);
+			ds.setConnectionTimeoutInMs(1000);
+			ds.setAcquireIncrement(2);
+			ds.setIdleConnectionTestPeriodInSeconds(10);
+			ds.setIdleMaxAgeInSeconds(10);
+			ds.setConnectionTestStatement("SELECT 1");
+			ds.setReleaseHelperThreads(0);
+			ds.setLogStatementsEnabled(false);
+			ds.setAcquireRetryDelayInMs(1000);
+			ds.setAcquireRetryAttempts(3);
+			ds.setLazyInit(false);
+			ds.setDisableJMX(true);
+			ds.setPoolAvailabilityThreshold(10);
 			this.dataSource = ds;
 		}
 
@@ -236,7 +245,7 @@ public class DbConfig extends ZNodeListener implements ConnectionAccess {
 
 		public void closeDataSource() throws SQLException {
 			if (dataSource != null) {
-				BasicDataSource ds = (BasicDataSource) dataSource;
+				BoneCPDataSource ds = (BoneCPDataSource) dataSource;
 				ds.close();
 			}
 		}

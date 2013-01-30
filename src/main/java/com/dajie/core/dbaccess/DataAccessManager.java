@@ -1,10 +1,8 @@
 package com.dajie.core.dbaccess;
 
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.List;
 import java.util.Map;
@@ -90,7 +88,7 @@ public class DataAccessManager {
 		Connection conn = null;
 		try {
 			conn = getReadConnection(op);
-			System.out.println("queryUnique(), conn:" + conn);
+			System.out.println("queryUnique(), conn:" + conn.getMetaData().getURL());
 			ps = conn.prepareStatement(op.getSql());
 			op.setParam(ps);
 			rs = ps.executeQuery();
@@ -188,7 +186,7 @@ public class DataAccessManager {
 		}
 		if (conn == null) {
 			throw new NotAvailableConnectionException("biz:" + op.getBizName()
-					+ "\tpattern:" + op.getPattern());
+					+ "\tpattern:" + op.getPattern() + "\tflag:W");
 		}
 		return conn;
 	}
@@ -208,7 +206,7 @@ public class DataAccessManager {
 		}
 		if (conn == null) {
 			throw new NotAvailableConnectionException("biz:" + op.getBizName()
-					+ "\tpattern:" + op.getPattern());
+					+ "\tpattern:" + op.getPattern() + "\tflag:R");
 		}
 		return conn;
 	}
