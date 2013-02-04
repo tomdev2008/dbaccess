@@ -3,8 +3,9 @@ package com.dajie.core.zk;
 import java.io.IOException;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.Logger;
+
+import com.dajie.core.dbresource.Constants;
 
 /**
  * 
@@ -12,7 +13,7 @@ import org.apache.commons.logging.LogFactory;
  * 
  */
 public class ZkManagerFactory {
-	private static Log logger = LogFactory.getLog(ZkManagerFactory.class);
+	private static Logger logger = Constants.logger;
 	private static ConcurrentHashMap<String, ZkManager> zkManagerMap = new ConcurrentHashMap<String, ZkManager>();
 
 	public static synchronized ZkManager get(String zkAddress) {

@@ -6,20 +6,18 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.Logger;
 
 import com.dajie.core.dbresource.Constants;
-
 
 /**
  * 
  * @author yong.li@dajie-inc.com
- *
+ * 
  */
 public class ZkClient {
 
-	private static Log logger = LogFactory.getLog(ZkClient.class);
+	private static Logger logger = Constants.logger;
 
 	static final String UPDATE_ALL_NAMESPACE = "HOLY_SHIT_UPDATE_ALL_NAMESPACE";
 
@@ -38,15 +36,15 @@ public class ZkClient {
 
 	private ReentrantReadWriteLock listenerRWLock;
 
-//	private Map<String, String> znodeVersionMap;
-//
-//	private Object znodeVersionLock;
-	
+	// private Map<String, String> znodeVersionMap;
+	//
+	// private Object znodeVersionLock;
+
 	private ZkClient(String zkAddress) throws ZookeeperException {
 		this.zkAddress = zkAddress;
 		initialize();
 	}
-	
+
 	public static ZkClient getInstance() throws ZookeeperException {
 		return getInstance(Constants.ZK_ADDRESS);
 	}
@@ -58,13 +56,13 @@ public class ZkClient {
 		try {
 			newZkAddress = System.getProperty("ZK_ADDRESS");
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error(e);
 		}
 		if (newZkAddress == null) {
 			try {
 				newZkAddress = System.getenv("ZK_ADDRESS");
 			} catch (Exception e) {
-				e.printStackTrace();
+				logger.error(e);
 			}
 		}
 		if (newZkAddress == null) {
@@ -99,8 +97,8 @@ public class ZkClient {
 		zkManager.setZkClient(this);
 		listeners = new HashMap<String, List<ZNodeListener>>();
 		listenerRWLock = new ReentrantReadWriteLock();
-//		znodeVersionMap = new HashMap<String, String>();
-//		znodeVersionLock = new Object();
+		// znodeVersionMap = new HashMap<String, String>();
+		// znodeVersionLock = new Object();
 		return isValid();
 	}
 
@@ -182,14 +180,14 @@ public class ZkClient {
 
 	private boolean updateZNode(String znodePath) {
 		boolean flag = true;
-//		String newVersion = getZNodeVersion(znodePath);
-//		synchronized (znodeVersionLock) {
-//			String oldVersion = znodeVersionMap.get(znodePath);
-//			if (newVersion.equals(oldVersion)) {
-//				return true;
-//			}
-//			znodeVersionMap.put(znodePath, newVersion);
-//		}
+		// String newVersion = getZNodeVersion(znodePath);
+		// synchronized (znodeVersionLock) {
+		// String oldVersion = znodeVersionMap.get(znodePath);
+		// if (newVersion.equals(oldVersion)) {
+		// return true;
+		// }
+		// znodeVersionMap.put(znodePath, newVersion);
+		// }
 		List<String> childrenNames = zkManager.getChildren(znodePath);
 		try {
 			listenerRWLock.readLock().lock();

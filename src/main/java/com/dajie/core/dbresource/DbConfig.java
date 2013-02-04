@@ -2,12 +2,16 @@ package com.dajie.core.dbresource;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Random;
+import java.util.Set;
 import java.util.regex.Pattern;
 
 import javax.sql.DataSource;
 
+import org.apache.log4j.Logger;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -23,18 +27,31 @@ import com.jolbox.bonecp.BoneCPDataSource;
  */
 public class DbConfig extends ZNodeListener implements ConnectionAccess {
 
+	private static Logger logger = Constants.logger;
+
 	private String bizName;
 
-	private List<Entry> entryList;
-
+	private Random random;
+	/** */
+	private List<Entry> readEntryList;
+	private List<Entry> writeEntryList;
 	private Object gate;
+
+	private Set<String> lastChildrenNames = new HashSet<String>();
+
+	/** */
 
 	public DbConfig(String bizName) {
 		super(Constants.DATABASE_DESC_PREFIX + bizName);
 		this.bizName = bizName;
+		random = new Random(System.currentTimeMillis());
+		readEntryList = new LinkedList<DbConfig.Entry>();
+		writeEntryList = new LinkedList<DbConfig.Entry>();
 		gate = new Object();
-		this.entryList = new LinkedList<DbConfig.Entry>();
 		init();
+		logger.debug("bizName:" + bizName + "\treadEntryList.size():"
+				+ readEntryList.size() + "\twriteEntryList.size():"
+				+ writeEntryList.size());
 	}
 
 	public void init() {
@@ -44,7 +61,7 @@ public class DbConfig extends ZNodeListener implements ConnectionAccess {
 			update(contentList);
 			ZkClient.getInstance().addZnodeListener(this);
 		} catch (ZookeeperException e) {
-			e.printStackTrace();
+			logger.error(e);
 		}
 	}
 
@@ -54,25 +71,27 @@ public class DbConfig extends ZNodeListener implements ConnectionAccess {
 	}
 
 	public Connection getReadConnection() throws Exception {
+		if (readEntryList.isEmpty()) {
+			return null;
+		}
 		synchronized (gate) {
+			int readEntrySize = readEntryList.size();
+			int index = random.nextInt(readEntrySize);
 			Connection conn = null;
-			for (Entry entry : entryList) {
-				if (entry.isReadable()) {
-					conn = entry.getConnection();
-				}
-			}
+			conn = readEntryList.get(index).getConnection();
 			return conn;
 		}
 	}
 
 	public Connection getReadConnection(String pattern) throws Exception {
+		if (readEntryList.isEmpty()) {
+			return null;
+		}
 		synchronized (gate) {
 			Connection conn = null;
-			for (Entry entry : entryList) {
-				if (entry.isReadable()) {
-					if (entry.match(pattern)) {
-						conn = entry.getConnection();
-					}
+			for (Entry entry : readEntryList) {
+				if (entry.match(pattern)) {
+					conn = entry.getConnection();
 				}
 			}
 			return conn;
@@ -80,25 +99,27 @@ public class DbConfig extends ZNodeListener implements ConnectionAccess {
 	}
 
 	public Connection getWriteConnection() throws Exception {
+		if (writeEntryList.isEmpty()) {
+			return null;
+		}
 		synchronized (gate) {
 			Connection conn = null;
-			for (Entry entry : entryList) {
-				if (entry.isWritable()) {
-					conn = entry.getConnection();
-				}
+			for (Entry entry : writeEntryList) {
+				conn = entry.getConnection();
 			}
 			return conn;
 		}
 	}
 
 	public Connection getWriteConnection(String pattern) throws Exception {
+		if (writeEntryList.isEmpty()) {
+			return null;
+		}
 		synchronized (gate) {
 			Connection conn = null;
-			for (Entry entry : entryList) {
-				if (entry.isWritable()) {
-					if (entry.match(pattern)) {
-						conn = entry.getConnection();
-					}
+			for (Entry entry : writeEntryList) {
+				if (entry.match(pattern)) {
+					conn = entry.getConnection();
 				}
 			}
 			return conn;
@@ -108,7 +129,14 @@ public class DbConfig extends ZNodeListener implements ConnectionAccess {
 	@Override
 	public boolean update(List<String> childrenNameList) {
 
-		List<Entry> newEntryList = new LinkedList<DbConfig.Entry>();
+		Set<String> nameSet = new HashSet<String>(childrenNameList);
+		if (nameSet.equals(lastChildrenNames)) {
+			logger.info("config no change! bizName:" + bizName);
+			return true;
+		}
+
+		List<Entry> newReadEntryList = new LinkedList<DbConfig.Entry>();
+		List<Entry> newWriteEntryList = new LinkedList<DbConfig.Entry>();
 		for (String nodeString : childrenNameList) {
 			try {
 				JSONObject node = new JSONObject(nodeString);
@@ -128,41 +156,52 @@ public class DbConfig extends ZNodeListener implements ConnectionAccess {
 				int maxSize = node.getInt(Constants.MAX_SIZE);
 				Entry entry = new Entry(host, port, user, password, flag,
 						patternStr, dbName, coreSize, maxSize);
-				newEntryList.add(entry);
+				if (entry.isWritable()) {
+					newWriteEntryList.add(entry);
+				} else {
+					newReadEntryList.add(entry);
+				}
 			} catch (JSONException e) {
-				e.printStackTrace();
+				logger.error(e);
 			}
 		}
 		synchronized (gate) {
+			// update set
+			lastChildrenNames.clear();
+			lastChildrenNames.addAll(nameSet);
 			// swap between two list and destroy old list resources
-			List<Entry> oldList = entryList;
-			entryList = newEntryList;
-			// destroy old list resources
-			if (oldList != null) {
-				for (Entry item : oldList) {
-					try {
-						item.closeDataSource();
-					} catch (Exception e) {
-						e.printStackTrace();
-					}
+
+			List<Entry> oldReadList = readEntryList;
+			readEntryList = newReadEntryList;
+			// destroy old read list
+			for (Entry item : oldReadList) {
+				try {
+					item.closeDataSource();
+				} catch (Exception e) {
+					logger.error(e);
+				}
+			}
+
+			List<Entry> oldWriteList = writeEntryList;
+			writeEntryList = newWriteEntryList;
+			// destroy old read list
+			for (Entry item : oldWriteList) {
+				try {
+					item.closeDataSource();
+				} catch (Exception e) {
+					logger.error(e);
 				}
 			}
 		}
 		return true;
 	}
 
-	// public static void main(String[] args) throws Exception {
-	// Entry entry = new Entry("localhost", 3306, "root", "12345", "R", null,
-	// "test", 5, 10);
-	// System.exit(0);
-	// }
-
-	static class Entry {
+	private static class Entry {
 		private String host;
 		private int port;
 		private String user;
 		private String password;
-		private String rwFlag; // R=1 or W=2
+		private String rwFlag;
 		private String patternStr;
 		private Pattern pattern;
 		private String dbName;
@@ -235,10 +274,6 @@ public class DbConfig extends ZNodeListener implements ConnectionAccess {
 			return rwFlag != null && rwFlag.contains(Constants.READ_FLAG);
 		}
 
-		public boolean isRW() {
-			return rwFlag != null && rwFlag.contains(Constants.WRITE_FLAG);
-		}
-
 		public Connection getConnection() throws SQLException {
 			return dataSource.getConnection();
 		}
@@ -272,7 +307,7 @@ public class DbConfig extends ZNodeListener implements ConnectionAccess {
 				json.put("maxSize", maxSize);
 				json.put("dataSource", dataSource.toString());
 			} catch (JSONException e) {
-				e.printStackTrace();
+				logger.error(e);
 			}
 			return json.toString();
 		}
