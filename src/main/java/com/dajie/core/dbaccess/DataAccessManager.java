@@ -7,6 +7,9 @@ import java.sql.Statement;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
+
+import com.dajie.core.dbresource.Constants;
 import com.dajie.core.dbresource.DbConfig;
 import com.dajie.core.dbresource.DbConfigManager;
 
@@ -16,6 +19,8 @@ import com.dajie.core.dbresource.DbConfigManager;
  * 
  */
 public class DataAccessManager {
+
+	private static Logger logger = Constants.logger;
 
 	private static DataAccessManager instance;
 
@@ -38,7 +43,7 @@ public class DataAccessManager {
 				rs.close();
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error(e);
 		}
 	}
 
@@ -48,7 +53,7 @@ public class DataAccessManager {
 				st.close();
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error(e);
 		}
 	}
 
@@ -58,7 +63,7 @@ public class DataAccessManager {
 				conn.close();
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			logger.error(e);
 		}
 	}
 
@@ -68,6 +73,7 @@ public class DataAccessManager {
 		Connection conn = null;
 		try {
 			conn = getReadConnection(op);
+			logger.debug("queryUnique(), conn:" + conn.getMetaData().getURL());
 			ps = conn.prepareStatement(op.getSql());
 			op.setParam(ps);
 			rs = ps.executeQuery();
@@ -88,7 +94,7 @@ public class DataAccessManager {
 		Connection conn = null;
 		try {
 			conn = getReadConnection(op);
-			System.out.println("queryUnique(), conn:" + conn.getMetaData().getURL());
+			logger.debug("queryUnique(), conn:" + conn.getMetaData().getURL());
 			ps = conn.prepareStatement(op.getSql());
 			op.setParam(ps);
 			rs = ps.executeQuery();
@@ -111,6 +117,7 @@ public class DataAccessManager {
 		Connection conn = null;
 		try {
 			conn = getReadConnection(op);
+			logger.debug("queryUnique(), conn:" + conn.getMetaData().getURL());
 			ps = conn.prepareStatement(op.getSql());
 			op.setParam(ps);
 			rs = ps.executeQuery();
@@ -132,6 +139,7 @@ public class DataAccessManager {
 		try {
 			conn = getWriteConnection(op);
 			ps = conn.prepareStatement(op.getSql());
+			logger.debug("queryUnique(), conn:" + conn.getMetaData().getURL());
 			op.setParam(ps);
 			int rows = ps.executeUpdate();
 			op.setResult(rows);
@@ -149,6 +157,7 @@ public class DataAccessManager {
 		Connection conn = null;
 		try {
 			conn = getWriteConnection(op);
+			logger.debug("queryUnique(), conn:" + conn.getMetaData().getURL());
 			ps = conn.prepareStatement(op.getSql());
 			op.setParam(ps);
 			int rows = ps.executeUpdate();

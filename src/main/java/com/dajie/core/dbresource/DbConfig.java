@@ -2,13 +2,16 @@ package com.dajie.core.dbresource;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
+import java.util.Set;
 import java.util.regex.Pattern;
 
 import javax.sql.DataSource;
 
+import org.apache.log4j.Logger;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -24,6 +27,8 @@ import com.jolbox.bonecp.BoneCPDataSource;
  */
 public class DbConfig extends ZNodeListener implements ConnectionAccess {
 
+	private static Logger logger = Constants.logger;
+
 	private String bizName;
 
 	private Random random;
@@ -31,6 +36,8 @@ public class DbConfig extends ZNodeListener implements ConnectionAccess {
 	private List<Entry> readEntryList;
 	private List<Entry> writeEntryList;
 	private Object gate;
+
+	private Set<String> lastChildrenNames = new HashSet<String>();
 
 	/** */
 
@@ -42,7 +49,9 @@ public class DbConfig extends ZNodeListener implements ConnectionAccess {
 		writeEntryList = new LinkedList<DbConfig.Entry>();
 		gate = new Object();
 		init();
-		System.out.println("bizName:" + bizName + "\treadEntryList.size():" + readEntryList.size() + "\twriteEntryList.size():" + writeEntryList.size());
+		logger.debug("bizName:" + bizName + "\treadEntryList.size():"
+				+ readEntryList.size() + "\twriteEntryList.size():"
+				+ writeEntryList.size());
 	}
 
 	public void init() {
@@ -52,7 +61,7 @@ public class DbConfig extends ZNodeListener implements ConnectionAccess {
 			update(contentList);
 			ZkClient.getInstance().addZnodeListener(this);
 		} catch (ZookeeperException e) {
-			e.printStackTrace();
+			logger.error(e);
 		}
 	}
 
@@ -119,6 +128,13 @@ public class DbConfig extends ZNodeListener implements ConnectionAccess {
 
 	@Override
 	public boolean update(List<String> childrenNameList) {
+
+		Set<String> nameSet = new HashSet<String>(childrenNameList);
+		if (nameSet.equals(lastChildrenNames)) {
+			logger.info("config no change! bizName:" + bizName);
+			return true;
+		}
+
 		List<Entry> newReadEntryList = new LinkedList<DbConfig.Entry>();
 		List<Entry> newWriteEntryList = new LinkedList<DbConfig.Entry>();
 		for (String nodeString : childrenNameList) {
@@ -146,10 +162,13 @@ public class DbConfig extends ZNodeListener implements ConnectionAccess {
 					newReadEntryList.add(entry);
 				}
 			} catch (JSONException e) {
-				e.printStackTrace();
+				logger.error(e);
 			}
 		}
 		synchronized (gate) {
+			// update set
+			lastChildrenNames.clear();
+			lastChildrenNames.addAll(nameSet);
 			// swap between two list and destroy old list resources
 
 			List<Entry> oldReadList = readEntryList;
@@ -159,7 +178,7 @@ public class DbConfig extends ZNodeListener implements ConnectionAccess {
 				try {
 					item.closeDataSource();
 				} catch (Exception e) {
-					e.printStackTrace();
+					logger.error(e);
 				}
 			}
 
@@ -170,20 +189,14 @@ public class DbConfig extends ZNodeListener implements ConnectionAccess {
 				try {
 					item.closeDataSource();
 				} catch (Exception e) {
-					e.printStackTrace();
+					logger.error(e);
 				}
 			}
 		}
 		return true;
 	}
 
-	// public static void main(String[] args) throws Exception {
-	// Entry entry = new Entry("localhost", 3306, "root", "12345", "R", null,
-	// "test", 5, 10);
-	// System.exit(0);
-	// }
-
-	static class Entry {
+	private static class Entry {
 		private String host;
 		private int port;
 		private String user;
@@ -261,10 +274,6 @@ public class DbConfig extends ZNodeListener implements ConnectionAccess {
 			return rwFlag != null && rwFlag.contains(Constants.READ_FLAG);
 		}
 
-		public boolean isRW() {
-			return rwFlag != null && rwFlag.contains(Constants.WRITE_FLAG);
-		}
-
 		public Connection getConnection() throws SQLException {
 			return dataSource.getConnection();
 		}
@@ -298,7 +307,7 @@ public class DbConfig extends ZNodeListener implements ConnectionAccess {
 				json.put("maxSize", maxSize);
 				json.put("dataSource", dataSource.toString());
 			} catch (JSONException e) {
-				e.printStackTrace();
+				logger.error(e);
 			}
 			return json.toString();
 		}
