@@ -4,13 +4,17 @@
 
 	<modelVersion>4.0.0</modelVersion>
 
-	<groupId>com.dajie</groupId>
+	<groupId>com.dajie.db</groupId>
 	<artifactId>dajie-dbaccess</artifactId>
 	<packaging>jar</packaging>
 	<version>1.0-SNAPSHOT</version>
 	<name>dajie-dbaccess</name>
-
-
+        <developers>
+                <developer>
+                        <name>yong.li</name>
+                        <email>yong.li@dajie-inc.com</email>
+                </developer>
+        </developers>
 	<dependencies>
 		<dependency>
 			<groupId>org.json</groupId>
@@ -39,7 +43,7 @@
 		</dependency>
 		<dependency>
 			<groupId>com.jolbox</groupId>
-			<artifactId>bonecp-spring</artifactId>
+			<artifactId>bonecp</artifactId>
 			<version>0.7.1.RELEASE</version>
 		</dependency>
 		<dependency>
