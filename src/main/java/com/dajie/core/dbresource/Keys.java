@@ -8,4 +8,6 @@ package com.dajie.core.dbresource;
  */
 public interface Keys {
 	
+	final String DB_VERIFY = "db_verify";
+	
 }

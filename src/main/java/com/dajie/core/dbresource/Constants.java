@@ -8,7 +8,7 @@ import org.apache.log4j.Logger;
  * 
  */
 public interface Constants {
-	final String ZK_ADDRESS = "127.0.0.1:2181";
+	final String ZK_ADDRESS = "10.10.32.57:2181,10.10.32.58:2181,10.10.32.59:2181";
 	final String DATABASE_DESC_PREFIX = "/database_desc/";
 
 	/** */
