@@ -1,5 +1,8 @@
 package com.dajie.core.dbaccess;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
 /**
  * 
  * @author yong.li@dajie-inc.com
@@ -26,5 +29,14 @@ public abstract class OpUpdate extends Operation<Integer> {
 
 	public void setResult(int result) {
 		this.result = result;
+	}
+
+	/**
+	 *  OpUpdate needn't implement parse method
+	 */
+	@Override
+	public Integer parse(ResultSet rs) throws SQLException {
+		// empty impl
+		return -1;
 	}
 }
