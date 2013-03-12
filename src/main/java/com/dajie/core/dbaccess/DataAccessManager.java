@@ -88,7 +88,8 @@ public class DataAccessManager {
 		return op.getResult();
 	}
 
-	public <T> T queryUnique(final OpUnique<T> op) throws Exception {
+	public List<Object> queryListR(final OpListR op, Class<?> cla)
+			throws Exception {
 		PreparedStatement ps = null;
 		ResultSet rs = null;
 		Connection conn = null;
@@ -98,9 +99,54 @@ public class DataAccessManager {
 			ps = conn.prepareStatement(op.getSql());
 			op.setParam(ps);
 			rs = ps.executeQuery();
+			while (rs.next()) {
+				op.add(op.parse(rs, cla));
+			}
+		} finally {
+			closeResultSet(rs);
+			closeStatement(ps);
+			closeConnection(conn);
+		}
+		return op.getResult();
+	}
+
+	public <T> T queryUnique(final OpUnique<T> op) throws Exception {
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+		Connection conn = null;
+		try {
+			conn = getReadConnection(op);
+			logger.debug("queryUnique(1), conn:" + conn.getMetaData().getURL());
+			ps = conn.prepareStatement(op.getSql());
+			op.setParam(ps);
+			rs = ps.executeQuery();
 			if (rs.next()) {
 				T result = op.parse(rs);
 				op.setResult(result);
+			}
+
+		} finally {
+			closeResultSet(rs);
+			closeStatement(ps);
+			closeConnection(conn);
+		}
+		return op.getResult();
+	}
+
+	public Object queryUnique(final OpUniqueR op, Class<?> cla)
+			throws Exception {
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+		Connection conn = null;
+		try {
+			conn = getReadConnection(op);
+			logger.debug("queryUnique(2), conn:" + conn.getMetaData().getURL());
+			ps = conn.prepareStatement(op.getSql());
+			op.setParam(ps);
+			rs = ps.executeQuery();
+			if (rs.next()) {
+				Object obj = op.parse(rs, cla);
+				op.setResult(obj);
 			}
 
 		} finally {
@@ -201,6 +247,46 @@ public class DataAccessManager {
 	}
 
 	private <T> Connection getReadConnection(Operation<T> op) throws Exception {
+		DbConfig dbConfig = DbConfigManager.getInstance().getConfig(
+				op.getBizName());
+		if (dbConfig == null) {
+			throw new NotAvailableConnectionException("biz:" + op.getBizName()
+					+ "\tpattern:" + op.getPattern());
+		}
+		Connection conn = null;
+		if (op.isRouter()) {
+			conn = dbConfig.getReadConnection(op.getPattern());
+		} else {
+			conn = dbConfig.getReadConnection();
+		}
+		if (conn == null) {
+			throw new NotAvailableConnectionException("biz:" + op.getBizName()
+					+ "\tpattern:" + op.getPattern() + "\tflag:R");
+		}
+		return conn;
+	}
+
+	private Connection getWriteConnection(OperationR op) throws Exception {
+		DbConfig dbConfig = DbConfigManager.getInstance().getConfig(
+				op.getBizName());
+		if (dbConfig == null) {
+			throw new NotAvailableConnectionException("biz:" + op.getBizName()
+					+ "\tpattern:" + op.getPattern());
+		}
+		Connection conn = null;
+		if (op.isRouter()) {
+			conn = dbConfig.getWriteConnection(op.getPattern());
+		} else {
+			conn = dbConfig.getWriteConnection();
+		}
+		if (conn == null) {
+			throw new NotAvailableConnectionException("biz:" + op.getBizName()
+					+ "\tpattern:" + op.getPattern() + "\tflag:W");
+		}
+		return conn;
+	}
+
+	private Connection getReadConnection(OperationR op) throws Exception {
 		DbConfig dbConfig = DbConfigManager.getInstance().getConfig(
 				op.getBizName());
 		if (dbConfig == null) {
