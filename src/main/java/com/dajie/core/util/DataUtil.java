@@ -19,42 +19,41 @@ import com.dajie.core.dbresource.Constants;
  */
 public class DataUtil {
 
-	private static Logger logger = Constants.logger;
+    private static Logger logger = Constants.logger;
 
-	public static Object convert(ResultSet rs, Class<?> cla) throws Exception {
-		Object obj = null;
-		try {
-			obj = cla.newInstance();
-		} catch (Exception e) {
-			throw e;
-		}
-		Field[] fields = cla.getDeclaredFields();
-		for (Field field : fields) {
-			String fName = field.getName();
-			String setMethodName = "set" + fName.substring(0, 1).toUpperCase()
-					+ fName.substring(1);
-			Method setMethod = null;
-			try {
-				setMethod = cla.getDeclaredMethod(setMethodName,
-						field.getType());
-			} catch (Exception e) {
-				logger.error(e);
-			}
-			if (setMethod == null) {
-				continue;
-			}
-			TableColumn anno = field.getAnnotation(TableColumn.class);
-			if (anno == null) {
-				continue;
-			}
-			String tableColumnName = anno.name();
-			try {
-				Object data = rs.getObject(tableColumnName);
-				setMethod.invoke(obj, data);
-			} catch (Exception e) {
-				logger.error(e);
-			}
-		}
-		return obj;
-	}
+    @SuppressWarnings("unchecked")
+    public static <T> T convert(ResultSet rs, Class<T> cla) throws Exception {
+        Object obj = null;
+        try {
+            obj = cla.newInstance();
+        } catch (Exception e) {
+            throw e;
+        }
+        Field[] fields = cla.getDeclaredFields();
+        for (Field field : fields) {
+            String fName = field.getName();
+            String setMethodName = "set" + fName.substring(0, 1).toUpperCase() + fName.substring(1);
+            Method setMethod = null;
+            try {
+                setMethod = cla.getDeclaredMethod(setMethodName, field.getType());
+            } catch (Exception e) {
+                logger.error(e);
+            }
+            if (setMethod == null) {
+                continue;
+            }
+            TableColumn anno = field.getAnnotation(TableColumn.class);
+            if (anno == null) {
+                continue;
+            }
+            String tableColumnName = anno.name();
+            try {
+                Object data = rs.getObject(tableColumnName);
+                setMethod.invoke(obj, data);
+            } catch (Exception e) {
+                logger.error(e);
+            }
+        }
+        return (T) obj;
+    }
 }

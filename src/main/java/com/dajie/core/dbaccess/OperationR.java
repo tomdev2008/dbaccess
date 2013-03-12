@@ -10,53 +10,52 @@ import java.sql.SQLException;
  * @author yong.li@dajie-inc.com
  * 
  */
-public abstract class OperationR {
+public abstract class OperationR<T> {
 
-	private String bizName;
+    private String bizName;
 
-	private int tableSuffix = -1;
+    private int tableSuffix = -1;
 
-	private String sql;
+    private String sql;
 
-	public boolean isRouter() {
-		return tableSuffix > -1;
-	}
+    public boolean isRouter() {
+        return tableSuffix > -1;
+    }
 
-	public String getBizName() {
-		return bizName;
-	}
+    public String getBizName() {
+        return bizName;
+    }
 
-	public void setBizName(String bizName) {
-		this.bizName = bizName;
-	}
+    public void setBizName(String bizName) {
+        this.bizName = bizName;
+    }
 
-	public int getTableSuffix() {
-		return tableSuffix;
-	}
+    public int getTableSuffix() {
+        return tableSuffix;
+    }
 
-	public void setTableSuffix(int tableSuffix) {
-		this.tableSuffix = tableSuffix;
-	}
+    public void setTableSuffix(int tableSuffix) {
+        this.tableSuffix = tableSuffix;
+    }
 
-	public String getSql() {
-		return sql;
-	}
+    public String getSql() {
+        return sql;
+    }
 
-	public void setSql(String sql) {
-		this.sql = sql;
-	}
+    public void setSql(String sql) {
+        this.sql = sql;
+    }
 
-	public String getPattern() {
-		StringBuffer sb = new StringBuffer();
-		sb.append(bizName);
-		if (tableSuffix >= 0) {
-			sb.append("_").append(tableSuffix);
-		}
-		return sb.toString();
-	}
+    public String getPattern() {
+        StringBuffer sb = new StringBuffer();
+        sb.append(bizName);
+        if (tableSuffix >= 0) {
+            sb.append("_").append(tableSuffix);
+        }
+        return sb.toString();
+    }
 
-	public abstract void setParam(PreparedStatement ps) throws SQLException;
+    public abstract void setParam(PreparedStatement ps) throws SQLException;
 
-	public abstract Object parse(ResultSet rs, Class<? extends Object> cla)
-			throws Exception;
+    public abstract T parse(ResultSet rs, Class<T> cla) throws Exception;
 }

@@ -12,36 +12,35 @@ import com.dajie.core.util.DataUtil;
  * @author yong.li@dajie-inc.com
  * 
  */
-public abstract class OpUniqueR extends OperationR {
+public abstract class OpUniqueR<T> extends OperationR<T> {
 
-	private Object result;
+    private T result;
 
-	public OpUniqueR(String sql, String bizName) {
+    public OpUniqueR(String sql, String bizName) {
 
-		setSql(sql);
-		setBizName(bizName);
-	}
+        setSql(sql);
+        setBizName(bizName);
+    }
 
-	public OpUniqueR(String sql, String bizName, int tableSuffix) {
-		setSql(sql);
-		setBizName(bizName);
-		setTableSuffix(tableSuffix);
-	}
+    public OpUniqueR(String sql, String bizName, int tableSuffix) {
+        setSql(sql);
+        setBizName(bizName);
+        setTableSuffix(tableSuffix);
+    }
 
-	public abstract void setParam(PreparedStatement ps) throws SQLException;
+    public abstract void setParam(PreparedStatement ps) throws SQLException;
 
-	@Override
-	public Object parse(ResultSet rs, Class<? extends Object> cla)
-			throws Exception {
-		return DataUtil.convert(rs, cla);
-	}
+    @Override
+    public T parse(ResultSet rs, Class<T> cla) throws Exception {
+        return DataUtil.convert(rs, cla);
+    }
 
-	public Object getResult() {
-		return result;
-	}
+    public T getResult() {
+        return result;
+    }
 
-	public void setResult(Object result) {
-		this.result = result;
-	}
+    public void setResult(T result) {
+        this.result = result;
+    }
 
 }

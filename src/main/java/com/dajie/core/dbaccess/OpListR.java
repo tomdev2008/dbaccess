@@ -10,44 +10,43 @@ import com.dajie.core.util.DataUtil;
 
 /**
  * OpListR is a java reflect version for OpList
+ * 
  * @author yong.li@dajie-inc.com
  * 
  */
-public abstract class OpListR extends OperationR {
+public abstract class OpListR<T> extends OperationR<T> {
 
-	private List<Object> collection;
+    private List<T> collection;
 
-	private void initEmptyCollection() {
-		collection = new ArrayList<Object>();
-	}
+    private void initEmptyCollection() {
+        collection = new ArrayList<T>();
+    }
 
-	public OpListR(String sql, String bizName) {
-		setSql(sql);
-		setBizName(bizName);
-		initEmptyCollection();
-	}
+    public OpListR(String sql, String bizName) {
+        setSql(sql);
+        setBizName(bizName);
+        initEmptyCollection();
+    }
 
-	public OpListR(String sql, String bizName, int tableSuffix) {
-		setSql(sql);
-		setBizName(bizName);
-		setTableSuffix(tableSuffix);
-		initEmptyCollection();
-	}
+    public OpListR(String sql, String bizName, int tableSuffix) {
+        setSql(sql);
+        setBizName(bizName);
+        setTableSuffix(tableSuffix);
+        initEmptyCollection();
+    }
 
-	public abstract void setParam(PreparedStatement ps) throws SQLException;
+    public abstract void setParam(PreparedStatement ps) throws SQLException;
 
-	@Override
-	public Object parse(ResultSet rs, Class<? extends Object> cla)
-			throws Exception {
-		return DataUtil.convert(rs, cla);
-	}
+    public T parse(ResultSet rs, Class<T> cla) throws Exception {
+        return DataUtil.convert(rs, cla);
+    }
 
-	public final void add(Object t) {
-		collection.add(t);
-	}
+    public final void add(T t) {
+        collection.add(t);
+    }
 
-	public List<Object> getResult() {
-		return collection;
-	}
+    public List<T> getResult() {
+        return collection;
+    }
 
 }

@@ -12,4 +12,8 @@ public interface Keys {
 	
 	final String DB_VERIFY_TEST = "db_verify_test";
 	
+	final String GEEK_SINGLE = "geek_single";
+	
+	final String GEEK_ROUTER = "geek_r";
+	
 }
