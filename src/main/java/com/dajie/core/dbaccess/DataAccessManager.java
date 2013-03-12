@@ -73,7 +73,7 @@ public class DataAccessManager {
 		Connection conn = null;
 		try {
 			conn = getReadConnection(op);
-			logger.debug("queryUnique(), conn:" + conn.getMetaData().getURL());
+			logger.debug("queryList(1), conn:" + conn.getMetaData().getURL());
 			ps = conn.prepareStatement(op.getSql());
 			op.setParam(ps);
 			rs = ps.executeQuery();
@@ -88,14 +88,14 @@ public class DataAccessManager {
 		return op.getResult();
 	}
 
-	public List<Object> queryListR(final OpListR op, Class<?> cla)
+	public List<Object> queryList(final OpListR op, Class<?> cla)
 			throws Exception {
 		PreparedStatement ps = null;
 		ResultSet rs = null;
 		Connection conn = null;
 		try {
 			conn = getReadConnection(op);
-			logger.debug("queryUnique(), conn:" + conn.getMetaData().getURL());
+			logger.debug("queryListR(2), conn:" + conn.getMetaData().getURL());
 			ps = conn.prepareStatement(op.getSql());
 			op.setParam(ps);
 			rs = ps.executeQuery();
@@ -163,7 +163,7 @@ public class DataAccessManager {
 		Connection conn = null;
 		try {
 			conn = getReadConnection(op);
-			logger.debug("queryUnique(), conn:" + conn.getMetaData().getURL());
+			logger.debug("queryMap(), conn:" + conn.getMetaData().getURL());
 			ps = conn.prepareStatement(op.getSql());
 			op.setParam(ps);
 			rs = ps.executeQuery();
