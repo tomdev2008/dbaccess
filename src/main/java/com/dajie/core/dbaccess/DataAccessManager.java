@@ -95,7 +95,7 @@ public class DataAccessManager {
 		Connection conn = null;
 		try {
 			conn = getReadConnection(op);
-			logger.debug("queryListR(2), conn:" + conn.getMetaData().getURL());
+			logger.debug("queryList(2), conn:" + conn.getMetaData().getURL());
 			ps = conn.prepareStatement(op.getSql());
 			op.setParam(ps);
 			rs = ps.executeQuery();
