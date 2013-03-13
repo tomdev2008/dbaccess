@@ -43,10 +43,12 @@ public class DataUtil {
                 continue;
             }
             TableColumn anno = field.getAnnotation(TableColumn.class);
-            if (anno == null) {
-                continue;
+            String tableColumnName;
+            if (anno != null) {
+                tableColumnName = anno.name();
+            } else {
+                tableColumnName = field.getName();
             }
-            String tableColumnName = anno.name();
             try {
                 Object data = rs.getObject(tableColumnName);
                 setMethod.invoke(obj, data);
