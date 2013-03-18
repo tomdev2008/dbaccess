@@ -31,7 +31,9 @@ public class DataAccessManager {
     public static DataAccessManager getInstance() {
         if (instance == null) {
             synchronized (DataAccessManager.class) {
-                instance = new DataAccessManager();
+                if (instance == null) {
+                    instance = new DataAccessManager();
+                }
             }
         }
         return instance;
