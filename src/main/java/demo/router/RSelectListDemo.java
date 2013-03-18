@@ -12,15 +12,16 @@ import com.dajie.core.dbresource.Keys;
 
 import demo.Geek;
 
-
 public class RSelectListDemo {
- static void foo() {
-        
+
+    static void foo() {
+
         final int id = 1;
         int mod = 10;
         int suffix = id % mod;
         String tableName = "geek_" + suffix;
-        String sql = "select ID,NAME,STATUS,HEIGHT,WEIGHT,BIRTH,LAST_LOGIN,SCORE FROM " + tableName +" WHERE ID = ?";
+        String sql = "select ID,NAME,STATUS,HEIGHT,WEIGHT,BIRTH,LAST_LOGIN,SCORE FROM " + tableName
+                + " WHERE ID = ?";
         OpUnique<Geek> op = new OpUnique<Geek>(sql, Keys.GEEK_ROUTER, suffix) {
 
             @Override

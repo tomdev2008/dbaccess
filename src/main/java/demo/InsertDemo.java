@@ -15,8 +15,8 @@ import com.dajie.core.dbresource.Keys;
 public class InsertDemo {
 
     static void foo() {
-        String sql = "INSERT INTO geek(NAME,STATUS,HEIGHT,WEIGHT,BIRTH,LAST_LOGIN,SCORE) " +
-        		"VALUES(?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO geek(NAME,STATUS,HEIGHT,WEIGHT,BIRTH,LAST_LOGIN,SCORE) "
+                + "VALUES(?, ?, ?, ?, ?, ?, ?)";
         OpUpdate op = new OpUpdate(sql, Keys.GEEK_SINGLE) {
 
             @Override

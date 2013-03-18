@@ -22,10 +22,10 @@ public class SelectListRDemo {
         };
         try {
             List<Geek> list = DataAccessManager.getInstance().queryList(op, Geek.class);
-           for (Geek g : list) {
-               System.out.println(g);
-           }
-         } catch (Exception e) {
+            for (Geek g : list) {
+                System.out.println(g);
+            }
+        } catch (Exception e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }

@@ -10,50 +10,49 @@ import org.junit.Test;
 /**
  * 
  * @author yong.li@dajie-inc.com
- *
+ * 
  */
 public class TestZkClient {
 
-	private static ZkClient zkClient;
+    private static ZkClient zkClient;
 
-	private static final String TEST_ZNODE = "/test";
+    private static final String TEST_ZNODE = "/test";
 
-	static {
-		// config log4j
-		BasicConfigurator.configure();
-		
-		// init zkClient
-		try {
-			zkClient = ZkClient.getInstance("localhost:2181");
-			zkClient.addZnodeListener(new Listener(TEST_ZNODE));
-			zkClient.addZnodeListener(new Listener(TEST_ZNODE));
-			zkClient.addZnodeListener(new Listener(TEST_ZNODE));
-		} catch (ZookeeperException e) {
-			e.printStackTrace();
-		}
-	}
+    static {
+        // config log4j
+        BasicConfigurator.configure();
 
-	@Test
-	public void testGetZNode() throws Exception {
-		Assert.assertNotNull(zkClient);
-		List<String> children = zkClient.getNodes(TEST_ZNODE);
-		System.out.println(children);
-		TimeUnit.SECONDS.sleep(5);
-	}
+        // init zkClient
+        try {
+            zkClient = ZkClient.getInstance("localhost:2181");
+            zkClient.addZnodeListener(new Listener(TEST_ZNODE));
+            zkClient.addZnodeListener(new Listener(TEST_ZNODE));
+            zkClient.addZnodeListener(new Listener(TEST_ZNODE));
+        } catch (ZookeeperException e) {
+            e.printStackTrace();
+        }
+    }
 
-	static class Listener extends ZNodeListener {
+    @Test
+    public void testGetZNode() throws Exception {
+        Assert.assertNotNull(zkClient);
+        List<String> children = zkClient.getNodes(TEST_ZNODE);
+        System.out.println(children);
+        TimeUnit.SECONDS.sleep(5);
+    }
 
-		public Listener(String znode) {
-			super(znode);
-		}
+    static class Listener extends ZNodeListener {
 
-		@Override
-		public boolean update(List<String> childrenNameList) {
-			System.out.println("znode:" + getZNode() + "\tchildren:"
-					+ childrenNameList);
-			return true;
-		}
+        public Listener(String znode) {
+            super(znode);
+        }
 
-	}
+        @Override
+        public boolean update(List<String> childrenNameList) {
+            System.out.println("znode:" + getZNode() + "\tchildren:" + childrenNameList);
+            return true;
+        }
+
+    }
 
 }

@@ -13,10 +13,10 @@ import com.dajie.core.dbresource.Keys;
 public class SelectOneDemo {
 
     static void foo() {
-        String sql = "select ID,NAME,STATUS,HEIGHT,WEIGHT,BIRTH,LAST_LOGIN,SCORE FROM geek " +
-        		"WHERE ID = ?";
-        
-//        String.format("select %d, %s", obj, obj ); 
+        String sql = "select ID,NAME,STATUS,HEIGHT,WEIGHT,BIRTH,LAST_LOGIN,SCORE FROM geek "
+                + "WHERE ID = ?";
+
+        //        String.format("select %d, %s", obj, obj ); 
         OpUnique<Geek> op = new OpUnique<Geek>(sql, Keys.GEEK_SINGLE) {
 
             @Override
