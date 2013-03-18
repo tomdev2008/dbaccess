@@ -28,7 +28,7 @@ public class RSelectOneRDemo {
             public void setParam(PreparedStatement ps) throws SQLException {
                 ps.setInt(1, id);
             }
-            
+
         };
 
         Geek g = null;

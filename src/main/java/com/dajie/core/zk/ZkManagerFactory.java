@@ -13,27 +13,28 @@ import com.dajie.core.dbresource.Constants;
  * 
  */
 public class ZkManagerFactory {
-	private static Logger logger = Constants.logger;
-	private static ConcurrentHashMap<String, ZkManager> zkManagerMap = new ConcurrentHashMap<String, ZkManager>();
 
-	public static synchronized ZkManager get(String zkAddress) {
-		logger.info("ZkManagerFactory.get zkAddress " + zkAddress);
-		ZkManager zm = zkManagerMap.get(zkAddress);
-		if (null == zm) {
-			logger.info("ZkManagerFactory.get new ZkManager for zkAddress "
-					+ zkAddress);
-			zm = new ZkManager();
-			try {
-				if (zm.initialize(zkAddress)) {
-					zkManagerMap.put(zkAddress, zm);
-				} else {
-					return null;
-				}
-			} catch (IOException e) {
-				logger.error("ZkManagerFactory.get IOException " + e
-						+ " for zkAddress " + zkAddress);
-			}
-		}
-		return zm;
-	}
+    private static Logger logger = Constants.logger;
+
+    private static ConcurrentHashMap<String, ZkManager> zkManagerMap = new ConcurrentHashMap<String, ZkManager>();
+
+    public static synchronized ZkManager get(String zkAddress) {
+        logger.info("ZkManagerFactory.get zkAddress " + zkAddress);
+        ZkManager zm = zkManagerMap.get(zkAddress);
+        if (null == zm) {
+            logger.info("ZkManagerFactory.get new ZkManager for zkAddress " + zkAddress);
+            zm = new ZkManager();
+            try {
+                if (zm.initialize(zkAddress)) {
+                    zkManagerMap.put(zkAddress, zm);
+                } else {
+                    return null;
+                }
+            } catch (IOException e) {
+                logger.error("ZkManagerFactory.get IOException " + e + " for zkAddress "
+                        + zkAddress);
+            }
+        }
+        return zm;
+    }
 }

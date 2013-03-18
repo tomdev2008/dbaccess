@@ -5,15 +5,15 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 
-
 /**
  * read text file util
+ * 
  * @author yong.li@dajie-inc.com
- *
+ * 
  */
 public class TextFileUtil {
 
-	public static String read(String filePath) {
+    public static String read(String filePath) {
         StringBuffer sb = new StringBuffer();
         try {
             BufferedReader in = new BufferedReader(new FileReader(filePath));
@@ -21,16 +21,16 @@ public class TextFileUtil {
                 String s;
                 while ((s = in.readLine()) != null) {
                     sb.append(s).append("\n");
-                }   
+                }
             } finally {
                 in.close();
-            }   
+            }
         } catch (IOException e) {
             e.printStackTrace();
-        }   
+        }
         return sb.toString();
     }
-	
+
     public static String read(File file) {
         StringBuffer sb = new StringBuffer();
         try {
