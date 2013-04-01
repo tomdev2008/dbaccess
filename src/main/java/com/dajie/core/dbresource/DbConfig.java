@@ -257,8 +257,8 @@ public class DbConfig extends ZNodeListener implements ConnectionAccess {
             ds.setMaxConnectionsPerPartition(maxSize);
             ds.setConnectionTimeoutInMs(1000);
             ds.setAcquireIncrement(2);
-            ds.setIdleConnectionTestPeriodInSeconds(10);
-            ds.setIdleMaxAgeInSeconds(10);
+            ds.setIdleConnectionTestPeriodInSeconds(2);
+            ds.setIdleMaxAgeInMinutes(15);
             ds.setConnectionTestStatement("SELECT 1");
             ds.setReleaseHelperThreads(0);
             ds.setLogStatementsEnabled(false);
