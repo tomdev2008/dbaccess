@@ -5,13 +5,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.Logger;
 import org.apache.zookeeper.KeeperException;
 import org.apache.zookeeper.WatchedEvent;
 import org.apache.zookeeper.Watcher;
 import org.apache.zookeeper.Watcher.Event.EventType;
 import org.apache.zookeeper.ZooKeeper;
+
+import com.dajie.core.dbresource.Constants;
 
 /**
  * 
@@ -20,7 +21,7 @@ import org.apache.zookeeper.ZooKeeper;
  */
 public class ZkManager {
 
-    private static Log logger = LogFactory.getLog(ZkManager.class);
+    private static Logger logger = Constants.logger;
 
     private ZooKeeper zk;
 

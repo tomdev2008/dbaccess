@@ -9,22 +9,17 @@
 	<packaging>jar</packaging>
 	<version>1.0-SNAPSHOT</version>
 	<name>dajie-dbaccess</name>
-        <developers>
-                <developer>
-                        <name>yong.li</name>
-                        <email>yong.li@dajie-inc.com</email>
-                </developer>
-        </developers>
+	<developers>
+		<developer>
+			<name>yong.li</name>
+			<email>yong.li@dajie-inc.com</email>
+		</developer>
+	</developers>
 	<dependencies>
 		<dependency>
 			<groupId>org.json</groupId>
 			<artifactId>json</artifactId>
 			<version>20090211</version>
-		</dependency>
-		<dependency>
-			<groupId>commons-logging</groupId>
-			<artifactId>commons-logging</artifactId>
-			<version>1.1.1</version>
 		</dependency>
 		<dependency>
 			<groupId>log4j</groupId>

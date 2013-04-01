@@ -4,8 +4,9 @@ import java.util.concurrent.BlockingDeque;
 import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.Logger;
+
+import com.dajie.core.dbresource.Constants;
 
 /**
  * 
@@ -14,7 +15,7 @@ import org.apache.commons.logging.LogFactory;
  */
 public class NotifyTask implements Runnable {
 
-    private static Log logger = LogFactory.getLog(NotifyTask.class);
+    private static Logger logger = Constants.logger;
 
     private ZkClient zkClient;
 
