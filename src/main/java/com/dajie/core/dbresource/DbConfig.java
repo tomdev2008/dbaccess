@@ -221,7 +221,7 @@ public class DbConfig extends ZNodeListener implements ConnectionAccess {
 
         private static final String CONNECTION_URL_PREFIX = "jdbc:mysql://";
 
-        private static final String CONNECTION_URL_SUFFIX = "?useunicode=true&characterencoding=utf8";
+        private static final String CONNECTION_URL_SUFFIX = "?useunicode=true&characterencoding=utf8&autoReconnect=true";
 
         private static final String MYSQL_DRIVER_CLASS = "com.mysql.jdbc.Driver";
 
