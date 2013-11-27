@@ -3,10 +3,11 @@ package demo.dao.impl;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
-import com.dajie.core.dbaccess.DataAccessManager;
-import com.dajie.core.dbaccess.OpUniqueR;
-import com.dajie.core.dbaccess.OpUpdate;
-import com.dajie.core.dbresource.Keys;
+import sirius.dbaccess.DataAccessManager;
+import sirius.dbaccess.OpUniqueR;
+import sirius.dbaccess.OpUpdate;
+import sirius.dbresource.Keys;
+
 
 import demo.Geek;
 import demo.dao.GeekDAO;

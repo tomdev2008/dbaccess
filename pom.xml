@@ -4,17 +4,11 @@
 
 	<modelVersion>4.0.0</modelVersion>
 
-	<groupId>com.dajie</groupId>
-	<artifactId>dj-dbaccess</artifactId>
+	<groupId>sirius</groupId>
+	<artifactId>dbaccess</artifactId>
 	<packaging>jar</packaging>
 	<version>1.0-SNAPSHOT</version>
-	<name>dajie-dbaccess</name>
-	<developers>
-		<developer>
-			<name>yong.li</name>
-			<email>yong.li@dajie-inc.com</email>
-		</developer>
-	</developers>
+	<name>dbaccess</name>
 	<dependencies>
 		<dependency>
 			<groupId>org.json</groupId>
@@ -52,4 +46,16 @@
 			<version>3.4.3</version>
 		</dependency>
 	</dependencies>
+        <build>
+                <plugins>
+                        <plugin>
+                                <artifactId>maven-compiler-plugin</artifactId>
+                                <configuration>
+                                        <source>1.7</source>
+                                        <target>1.7</target>
+                                </configuration>
+                        </plugin>
+                </plugins>
+        </build>
+
 </project>

@@ -6,9 +6,10 @@ import java.util.Random;
 
 import org.apache.log4j.BasicConfigurator;
 
-import com.dajie.core.dbaccess.DataAccessManager;
-import com.dajie.core.dbaccess.OpUpdate;
-import com.dajie.core.dbresource.Keys;
+import sirius.dbaccess.DataAccessManager;
+import sirius.dbaccess.OpUpdate;
+import sirius.dbresource.Keys;
+
 
 public class UpdateDemo {
 

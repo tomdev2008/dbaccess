@@ -5,9 +5,10 @@ import java.sql.SQLException;
 
 import org.apache.log4j.BasicConfigurator;
 
-import com.dajie.core.dbaccess.DataAccessManager;
-import com.dajie.core.dbaccess.OpUniqueR;
-import com.dajie.core.dbresource.Keys;
+import sirius.dbaccess.DataAccessManager;
+import sirius.dbaccess.OpUniqueR;
+import sirius.dbresource.Keys;
+
 
 public class SelectOneRDemo {
 

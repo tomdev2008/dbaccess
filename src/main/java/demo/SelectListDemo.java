@@ -7,9 +7,10 @@ import java.util.List;
 
 import org.apache.log4j.BasicConfigurator;
 
-import com.dajie.core.dbaccess.DataAccessManager;
-import com.dajie.core.dbaccess.OpList;
-import com.dajie.core.dbresource.Keys;
+import sirius.dbaccess.DataAccessManager;
+import sirius.dbaccess.OpList;
+import sirius.dbresource.Keys;
+
 
 public class SelectListDemo {
 

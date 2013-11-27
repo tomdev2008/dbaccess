@@ -6,9 +6,10 @@ import java.sql.SQLException;
 
 import org.apache.log4j.BasicConfigurator;
 
-import com.dajie.core.dbaccess.DataAccessManager;
-import com.dajie.core.dbaccess.OpUnique;
-import com.dajie.core.dbresource.Keys;
+import sirius.dbaccess.DataAccessManager;
+import sirius.dbaccess.OpUnique;
+import sirius.dbresource.Keys;
+
 
 import demo.Geek;
 

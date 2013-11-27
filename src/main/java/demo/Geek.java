@@ -3,7 +3,8 @@ package demo;
 import java.sql.Date;
 import java.sql.Timestamp;
 
-import com.dajie.core.dbaccess.annotation.TableColumn;
+import sirius.dbaccess.annotation.TableColumn;
+
 
 public class Geek {
 
