@@ -13,7 +13,6 @@ import sirius.dbresource.Constants;
 import sirius.dbresource.DbConfig;
 import sirius.dbresource.DbConfigManager;
 
-
 /**
  * 
  * @author liyong19861014@gmail.com

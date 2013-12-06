@@ -6,7 +6,6 @@ import java.sql.SQLException;
 
 import sirius.util.DataUtil;
 
-
 /**
  * OpUniqueR is java reflect version for OpUnique
  * 

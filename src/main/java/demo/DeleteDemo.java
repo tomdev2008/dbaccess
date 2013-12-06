@@ -9,7 +9,6 @@ import sirius.dbaccess.DataAccessManager;
 import sirius.dbaccess.OpUpdate;
 import sirius.dbresource.Keys;
 
-
 public class DeleteDemo {
 
     static void foo() {

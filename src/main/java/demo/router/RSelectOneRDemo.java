@@ -8,8 +8,6 @@ import org.apache.log4j.BasicConfigurator;
 import sirius.dbaccess.DataAccessManager;
 import sirius.dbaccess.OpUniqueR;
 import sirius.dbresource.Keys;
-
-
 import demo.Geek;
 
 public class RSelectOneRDemo {

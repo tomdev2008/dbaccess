@@ -10,7 +10,6 @@ import sirius.dbaccess.DataAccessManager;
 import sirius.dbaccess.OpUpdate;
 import sirius.dbresource.Keys;
 
-
 public class UpdateDemo {
 
     static void foo() {

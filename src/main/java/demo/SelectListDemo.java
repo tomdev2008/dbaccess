@@ -11,7 +11,6 @@ import sirius.dbaccess.DataAccessManager;
 import sirius.dbaccess.OpList;
 import sirius.dbresource.Keys;
 
-
 public class SelectListDemo {
 
     static void foo() {

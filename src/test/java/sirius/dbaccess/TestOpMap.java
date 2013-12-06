@@ -9,7 +9,6 @@ import junit.framework.TestCase;
 
 import org.junit.Test;
 
-
 public class TestOpMap extends TestCase {
 
     @Test

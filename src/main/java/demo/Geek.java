@@ -5,7 +5,6 @@ import java.sql.Timestamp;
 
 import sirius.dbaccess.annotation.TableColumn;
 
-
 public class Geek {
 
     @TableColumn(name = "ID")

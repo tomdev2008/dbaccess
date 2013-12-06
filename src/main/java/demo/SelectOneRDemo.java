@@ -9,7 +9,6 @@ import sirius.dbaccess.DataAccessManager;
 import sirius.dbaccess.OpUniqueR;
 import sirius.dbresource.Keys;
 
-
 public class SelectOneRDemo {
 
     static void foo() {

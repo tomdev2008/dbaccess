@@ -12,7 +12,6 @@ import sirius.dbaccess.DataAccessManager;
 import sirius.dbaccess.OpUpdate;
 import sirius.dbresource.Keys;
 
-
 public class InsertDemo {
 
     static void foo() {

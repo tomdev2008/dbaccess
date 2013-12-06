@@ -7,7 +7,6 @@ import org.apache.log4j.BasicConfigurator;
 import org.junit.Assert;
 import org.junit.Test;
 
-
 /**
  * 
  * @author liyong19861014@gmail.com

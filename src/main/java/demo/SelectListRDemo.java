@@ -10,7 +10,6 @@ import sirius.dbaccess.DataAccessManager;
 import sirius.dbaccess.OpListR;
 import sirius.dbresource.Keys;
 
-
 public class SelectListRDemo {
 
     static void foo() {

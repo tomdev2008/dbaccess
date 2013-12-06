@@ -9,7 +9,6 @@ import org.apache.log4j.Logger;
 import sirius.dbaccess.annotation.TableColumn;
 import sirius.dbresource.Constants;
 
-
 /**
  * convert mysql data to java Object
  * 

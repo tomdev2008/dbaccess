@@ -7,8 +7,6 @@ import sirius.dbaccess.DataAccessManager;
 import sirius.dbaccess.OpUniqueR;
 import sirius.dbaccess.OpUpdate;
 import sirius.dbresource.Keys;
-
-
 import demo.Geek;
 import demo.dao.GeekDAO;
 

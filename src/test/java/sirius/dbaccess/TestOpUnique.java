@@ -9,7 +9,6 @@ import junit.framework.TestCase;
 
 import org.junit.Test;
 
-
 public class TestOpUnique extends TestCase {
 
     private static Random rand = new Random(System.currentTimeMillis());

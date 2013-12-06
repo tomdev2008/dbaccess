@@ -8,7 +8,6 @@ import java.util.List;
 
 import sirius.util.DataUtil;
 
-
 /**
  * OpListR is a java reflect version for OpList
  * 

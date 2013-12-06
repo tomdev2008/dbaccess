@@ -12,7 +12,6 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-
 @RunWith(OrderedRunner.class)
 public class TestOpUpdateRouterMode extends TestCase {
 

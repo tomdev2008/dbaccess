@@ -8,7 +8,6 @@ import org.apache.log4j.Logger;
 
 import sirius.dbresource.Constants;
 
-
 /**
  * 
  * @author liyong19861014@gmail.com
