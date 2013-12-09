@@ -7,19 +7,19 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock.ReadLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
 
-import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Logger;
 
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 import sirius.cache.exception.CacheException;
 import sirius.util.Continuum;
+import sirius.util.SerializeUtil;
 import sirius.zkclient.ZkClient;
 import sirius.zkclient.exception.ZkException;
 import sirius.zkclient.listener.NodeDataListener;
 
 /**
- * impl
+ * 客户端使用的类
  * 
  * @author michael
  * @email liyong19861014@gmail.com
@@ -78,7 +78,26 @@ public class CacheClient extends NodeDataListener implements CacheAccess {
 
     public CacheClient(String nodePath) {
         super(nodePath);
-        // TODO Auto-generated constructor stub
+    }
+
+    /**
+     * 取对象
+     * 
+     * @param key
+     * @return
+     * @throws CacheException
+     */
+    public Object getObject(String key) throws CacheException {
+        Object obj = null;
+        byte[] byteVal = get(key);
+        if (byteVal != null && byteVal.length != 0) {
+            try {
+                obj = SerializeUtil.deserialize(byteVal);
+            } catch (Exception e) {
+                throw new CacheException(description("CacheClient.getObject() key:" + key));
+            }
+        }
+        return obj;
     }
 
     @Override
@@ -108,6 +127,29 @@ public class CacheClient extends NodeDataListener implements CacheAccess {
             throw new CacheException(description(e.getMessage()), e);
         }
         return value;
+    }
+
+    /**
+     * 写对象接口， Object必要是可序列化的
+     * 
+     * @param key
+     * @param val
+     * @param expireTime
+     * @return
+     * @throws CacheException
+     */
+    public boolean setObject(String key, Object val, int expireTime) throws CacheException {
+        if (val == null) {
+            return false;
+        }
+        try {
+            byte[] byteVal = SerializeUtil.serialize(val);
+            return set(key, byteVal, expireTime);
+        } catch (Exception e) {
+            logger.error("CacheClient.setObject() key:" + key + "\tvalue:" + val + "\texpireTime:"
+                    + expireTime);
+            throw new CacheException(description(e.getMessage()), e);
+        }
     }
 
     @Override
@@ -141,7 +183,7 @@ public class CacheClient extends NodeDataListener implements CacheAccess {
 
     @Override
     public Map<String, byte[]> multiGet(List<String> keys) throws CacheException {
-        // TODO Auto-generated method stub
+        //TODO
         return null;
     }
 
@@ -238,6 +280,7 @@ public class CacheClient extends NodeDataListener implements CacheAccess {
      */
     @Override
     public boolean delete() {
+        logger.warn(description("CacheClient.delete() znodepath is deleted"));
         return true;
     }
 
@@ -296,42 +339,53 @@ public class CacheClient extends NodeDataListener implements CacheAccess {
         return false;
     }
 
-    public static void main(String[] args) {
-        BasicConfigurator.configure();
-        //        ZkClient client = ZkClientFactory.get(Constant.DEFAULT_ZK_ADDRESS);
-        //        try {
-        //            List<String> nodes = client.getChildren("/cache/namespace", false);
-        //            for (String node : nodes) {
-        //                System.out.println(node);
-        //                String[] fields = node.split(":");
-        //                System.out.println(Arrays.toString(fields));
-        //                String pwd = fields[3];
-        //            }
-        //        } catch (ZkException e) {
-        //            // TODO Auto-generated catch block
-        //            e.printStackTrace();
-        //        }
-
-        CacheClient cacheClient = new CacheClient("namespace", "BIZ_HOTEL");
-
-        try {
-
-            byte[] data = cacheClient.get("mykey");
-            if (data != null) {
-                String str = new String(data);
-                System.out.println(str);
-            }
-
-            //            logger.debug(cacheClient.delete("mykey"));
-
-            //            logger.debug(cacheClient.strlen("mykey"));
-            //            logger.debug(cacheClient.exists("mykey"));
-
-            cacheClient.set("mykey", "fuckfuckfuck".getBytes(), 3600);
-        } catch (CacheException e) {
-            e.printStackTrace();
-        }
-        logger.debug("hello world");
+    @Override
+    public boolean setLong(String key, long value, int expireTime) throws CacheException {
+        return set(key, String.valueOf(value).getBytes(), expireTime);
     }
 
+    @Override
+    public long getLong(String key) throws CacheException {
+        long res = Constant.ERROR_COUNT;
+        byte[] byteVal = get(key);
+        if (byteVal != null && byteVal.length != 0) {
+            try {
+                res = Long.parseLong(new String(byteVal));
+            } catch (Exception e) {
+                logger.error(e);
+                throw new CacheException(description(e.getMessage()), e);
+            }
+        }
+        return res;
+    }
+
+    @Override
+    public long incLong(String key, long step) throws CacheException {
+        long res = Constant.ERROR_COUNT;
+        String cacheKey = generateCacheKey(business, key);
+        JedisPool pool = locateJedisPool(key);
+        if (pool == null) {
+            logger.error("CacheClient.incLong() cannot get JedisPool! key:" + key + "\tstep:"
+                    + step);
+            return res;
+        }
+        Jedis jedis = null;
+        try {
+            jedis = pool.getResource();
+            if (jedis != null) {
+                res = jedis.incrBy(cacheKey.getBytes(), step);
+            }
+            pool.returnResource(jedis);
+        } catch (Exception e) {
+            if (jedis != null) {
+                try {
+                    pool.returnBrokenResource(jedis);
+                } catch (Exception ex) {
+                    throw new CacheException(description(ex.getMessage()), ex);
+                }
+            }
+            throw new CacheException(description(e.getMessage()), e);
+        }
+        return res;
+    }
 }

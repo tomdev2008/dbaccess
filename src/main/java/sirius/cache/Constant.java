@@ -23,4 +23,6 @@ public interface Constant {
 
     final Long SUCCESS = 1L;
 
+    final Long ERROR_COUNT = -1L;
+
 }

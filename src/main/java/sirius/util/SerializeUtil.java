@@ -6,6 +6,10 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
+import org.apache.log4j.Logger;
+
+import sirius.cache.Constant;
+
 /**
  * 
  * @author liyong19861014@gmail.com
@@ -14,6 +18,8 @@ import java.io.ObjectOutputStream;
 public class SerializeUtil {
 
     private static int BUFFER_SIZE = 1024 * 10 * 4;
+
+    private static Logger logger = Constant.logger;
 
     /**
      * 序列化
@@ -54,7 +60,7 @@ public class SerializeUtil {
         try {
             obj = objStream.readObject();
         } catch (ClassNotFoundException e) {
-            e.printStackTrace();
+            logger.error(e);
         }
         objStream.close();
         return obj;
