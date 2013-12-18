@@ -48,6 +48,12 @@ public class CacheClient extends NodeDataListener implements CacheAccess {
         jedisPoolMap = new HashMap<String, JedisPool>();
         rwLock = new ReentrantReadWriteLock();
         zkClient = ZkClient.getInstance(Constant.DEFAULT_ZK_ADDRESS);
+        zkClient.addNodeDataListener(this);
+        try { //register event 
+            zkClient.exist(getNodePath(), true);
+        } catch (ZkException e) {
+            logger.error(e);
+        }
         update(getNodePath());
     }
 
@@ -76,9 +82,6 @@ public class CacheClient extends NodeDataListener implements CacheAccess {
         return sb.toString();
     }
 
-    public CacheClient(String nodePath) {
-        super(nodePath);
-    }
 
     /**
      * 取对象
@@ -336,7 +339,7 @@ public class CacheClient extends NodeDataListener implements CacheAccess {
         } finally {
             wlock.unlock();
         }
-        return false;
+        return true;
     }
 
     @Override
@@ -388,4 +391,16 @@ public class CacheClient extends NodeDataListener implements CacheAccess {
         }
         return res;
     }
+    /**
+    public static void main(String[] args) {
+        BasicConfigurator.configure();
+        CacheClient cc = new CacheClient("namespace", "hotel");
+        
+        try {
+            TimeUnit.HOURS.sleep(1);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+    */
 }
