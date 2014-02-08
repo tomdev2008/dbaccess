@@ -1,17 +1,23 @@
 package sirius.cache;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Random;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock.ReadLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
 
+import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Logger;
 
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 import sirius.cache.exception.CacheException;
+import sirius.cache.exception.StorageException;
 import sirius.util.Continuum;
 import sirius.util.SerializeUtil;
 import sirius.zkclient.ZkClient;
@@ -19,12 +25,12 @@ import sirius.zkclient.exception.ZkException;
 import sirius.zkclient.listener.NodeDataListener;
 
 /**
- * 客户端使用的类
+ * 客户端使用的类 StorageClient
  * 
  * @author michael
  * @email liyong19861014@gmail.com
  */
-public class CacheClient extends NodeDataListener implements CacheAccess {
+public class StorageClient extends NodeDataListener implements CacheAccess {
 
     private static Logger logger = Constant.logger;
 
@@ -34,18 +40,21 @@ public class CacheClient extends NodeDataListener implements CacheAccess {
 
     private Continuum continuum;
 
-    private Map<String, JedisPool> jedisPoolMap; // nick to pool
+    private Map<String, List<JedisPool>> poolMap;
+
+    private Random rand; //randomize to get jedispool
 
     private ReentrantReadWriteLock rwLock;
 
     private ZkClient zkClient;
 
-    public CacheClient(String namespace, String business) {
-        super(Constant.DEFAULT_CACHE_PREFIX + Constant.DIR_SEPARATOR + namespace);
+    public StorageClient(String namespace, String business) {
+        super(Constant.DEFAULT_STORAGE_PREFIX + Constant.DIR_SEPARATOR + namespace);
         this.namespace = namespace;
         this.business = business;
         this.continuum = new Continuum(business);
-        jedisPoolMap = new HashMap<String, JedisPool>();
+        poolMap = new HashMap<String, List<JedisPool>>();
+        rand = new Random(System.currentTimeMillis());
         rwLock = new ReentrantReadWriteLock();
         zkClient = ZkClient.getInstance(Constant.DEFAULT_ZK_ADDRESS);
         zkClient.addNodeDataListener(this);
@@ -66,7 +75,18 @@ public class CacheClient extends NodeDataListener implements CacheAccess {
         ReadLock rlock = rwLock.readLock();
         try {
             rlock.lock();
-            return jedisPoolMap.get(nickname);
+            List<JedisPool> pools = poolMap.get(nickname);
+            if (pools == null || pools.isEmpty()) {
+                return null;
+            } else {
+                int size = pools.size();
+                if (size == 1) { //needn't to get randomly
+                    return pools.get(0);
+                } else {
+                    return pools.get(rand.nextInt(size));
+                }
+
+            }
         } finally {
             rlock.unlock();
         }
@@ -87,7 +107,7 @@ public class CacheClient extends NodeDataListener implements CacheAccess {
      * 
      * @param key
      * @return
-     * @throws CacheException
+     * @throws StorageException
      */
     public Object getObject(String key) throws CacheException {
         Object obj = null;
@@ -96,7 +116,7 @@ public class CacheClient extends NodeDataListener implements CacheAccess {
             try {
                 obj = SerializeUtil.deserialize(byteVal);
             } catch (Exception e) {
-                throw new CacheException(description("CacheClient.getObject() key:" + key));
+                throw new StorageException(description("StorageClient.getObject() key:" + key));
             }
         }
         return obj;
@@ -107,7 +127,7 @@ public class CacheClient extends NodeDataListener implements CacheAccess {
         String cacheKey = generateCacheKey(business, key);
         JedisPool pool = locateJedisPool(key);
         if (pool == null) {
-            logger.error(description("CacheClient.get() cannot get JedisPool! key:" + key));
+            logger.error(description("StorageClient.get() cannot get JedisPool! key:" + key));
             return null;
         }
         Jedis jedis = null;
@@ -123,10 +143,10 @@ public class CacheClient extends NodeDataListener implements CacheAccess {
                 try {
                     pool.returnBrokenResource(jedis);
                 } catch (Exception ex) {
-                    throw new CacheException(description(ex.getMessage()), ex);
+                    throw new StorageException(description(ex.getMessage()), ex);
                 }
             }
-            throw new CacheException(description(e.getMessage()), e);
+            throw new StorageException(description(e.getMessage()), e);
         }
         return value;
     }
@@ -138,7 +158,7 @@ public class CacheClient extends NodeDataListener implements CacheAccess {
      * @param val
      * @param expireTime
      * @return
-     * @throws CacheException
+     * @throws StorageException
      */
     public boolean setObject(String key, Object val, int expireTime) throws CacheException {
         if (val == null) {
@@ -148,9 +168,9 @@ public class CacheClient extends NodeDataListener implements CacheAccess {
             byte[] byteVal = SerializeUtil.serialize(val);
             return set(key, byteVal, expireTime);
         } catch (Exception e) {
-            logger.error(description("CacheClient.setObject() key:" + key + "\tvalue:" + val
+            logger.error(description("StorageClient.setObject() key:" + key + "\tvalue:" + val
                     + "\texpireTime:" + expireTime));
-            throw new CacheException(description(e.getMessage()), e);
+            throw new StorageException(description(e.getMessage()), e);
         }
     }
 
@@ -159,7 +179,7 @@ public class CacheClient extends NodeDataListener implements CacheAccess {
         String cacheKey = generateCacheKey(business, key);
         JedisPool pool = locateJedisPool(key);
         if (pool == null) {
-            logger.error(description("CacheClient.get() cannot get JedisPool! key:" + key));
+            logger.error(description("StorageClient.get() cannot get JedisPool! key:" + key));
             return false;
         }
         Jedis jedis = null;
@@ -175,10 +195,10 @@ public class CacheClient extends NodeDataListener implements CacheAccess {
                 try {
                     pool.returnBrokenResource(jedis);
                 } catch (Exception ex) {
-                    throw new CacheException(description(ex.getMessage()), ex);
+                    throw new StorageException(description(ex.getMessage()), ex);
                 }
             }
-            throw new CacheException(description(e.getMessage()), e);
+            throw new StorageException(description(e.getMessage()), e);
         }
         return Constant.OK.equals(okay);
     }
@@ -194,7 +214,7 @@ public class CacheClient extends NodeDataListener implements CacheAccess {
         String cacheKey = generateCacheKey(business, key);
         JedisPool pool = locateJedisPool(key);
         if (pool == null) {
-            logger.error(description("CacheClient.exists() cannot get JedisPool! key:" + key));
+            logger.error(description("StorageClient.exists() cannot get JedisPool! key:" + key));
             return false;
         }
         Jedis jedis = null;
@@ -210,10 +230,10 @@ public class CacheClient extends NodeDataListener implements CacheAccess {
                 try {
                     pool.returnBrokenResource(jedis);
                 } catch (Exception ex) {
-                    throw new CacheException(description(ex.getMessage()), ex);
+                    throw new StorageException(description(ex.getMessage()), ex);
                 }
             }
-            throw new CacheException(description(e.getMessage()), e);
+            throw new StorageException(description(e.getMessage()), e);
         }
         return res;
     }
@@ -223,7 +243,7 @@ public class CacheClient extends NodeDataListener implements CacheAccess {
         String cacheKey = generateCacheKey(business, key);
         JedisPool pool = locateJedisPool(key);
         if (pool == null) {
-            logger.error(description("CacheClient.strlen() cannot get JedisPool! key:" + key));
+            logger.error(description("StorageClient.strlen() cannot get JedisPool! key:" + key));
             return -1L;
         }
         Jedis jedis = null;
@@ -240,10 +260,10 @@ public class CacheClient extends NodeDataListener implements CacheAccess {
                 try {
                     pool.returnBrokenResource(jedis);
                 } catch (Exception ex) {
-                    throw new CacheException(description(ex.getMessage()), ex);
+                    throw new StorageException(description(ex.getMessage()), ex);
                 }
             }
-            throw new CacheException(description(e.getMessage()), e);
+            throw new StorageException(description(e.getMessage()), e);
         }
         return len;
     }
@@ -253,7 +273,7 @@ public class CacheClient extends NodeDataListener implements CacheAccess {
         String cacheKey = generateCacheKey(business, key);
         JedisPool pool = locateJedisPool(key);
         if (pool == null) {
-            logger.error(description("CacheClient.delete() cannot get JedisPool! key:" + key));
+            logger.error(description("StorageClient.delete() cannot get JedisPool! key:" + key));
             return false;
         }
         Jedis jedis = null;
@@ -269,10 +289,10 @@ public class CacheClient extends NodeDataListener implements CacheAccess {
                 try {
                     pool.returnBrokenResource(jedis);
                 } catch (Exception ex) {
-                    throw new CacheException(description(ex.getMessage()), ex);
+                    throw new StorageException(description(ex.getMessage()), ex);
                 }
             }
-            throw new CacheException(description(e.getMessage()), e);
+            throw new StorageException(description(e.getMessage()), e);
         }
         return res.equals(Constant.SUCCESS);
     }
@@ -282,7 +302,7 @@ public class CacheClient extends NodeDataListener implements CacheAccess {
      */
     @Override
     public boolean delete() {
-        logger.warn(description("CacheClient.delete() znodepath is deleted"));
+        logger.warn(description("StorageClient.delete() znodepath is deleted"));
         return true;
     }
 
@@ -292,7 +312,7 @@ public class CacheClient extends NodeDataListener implements CacheAccess {
         try {
             wlock.lock();
             if (zkClient == null) {
-                logger.error(description("zkClient is null!"));
+                logger.error("zkClient is null!");
                 return false;
             }
 
@@ -304,7 +324,7 @@ public class CacheClient extends NodeDataListener implements CacheAccess {
             }
             if (nodes != null) {
                 Continuum cm = new Continuum(business);
-                Map<String, JedisPool> newPoolMap = new HashMap<String, JedisPool>();
+                Map<String, List<JedisPool>> newPoolMap = new HashMap<String, List<JedisPool>>();
                 for (String node : nodes) {
                     // name:host:port:pwd:timeout
                     String[] fields = node.split(Constant.SEPARATOR);
@@ -321,20 +341,26 @@ public class CacheClient extends NodeDataListener implements CacheAccess {
                         continue;
                     }
                     JedisPool pool = JedisPoolFactory.getPool(host, port, timeout, password);
-                    newPoolMap.put(nickname, pool);
-                    cm.add(nickname, 100);
+                    if (newPoolMap.containsKey(nickname)) {
+                        newPoolMap.get(nickname).add(pool);
+                    } else {
+                        List<JedisPool> pools = new ArrayList<JedisPool>();
+                        pools.add(pool);
+                        newPoolMap.put(nickname, pools);
+                        cm.add(nickname, 100);
+                    }
                 }
                 if (!newPoolMap.isEmpty()) {
                     cm.rebuild();
                     this.continuum = cm;
-                    this.jedisPoolMap.clear();
-                    this.jedisPoolMap.putAll(newPoolMap);
+                    this.poolMap.clear();
+                    this.poolMap.putAll(newPoolMap);
                 }
             }
 
-            logger.debug("continuum.size():" + continuum.size());
-            logger.debug("jedisPoolMap.size():" + jedisPoolMap.size());
-
+            logger.debug(description("continuum.size():" + continuum.size()));
+            logger.debug(description("poolMap.size():" + poolMap.size()));
+            logger.debug(description(poolMap.toString()));
         } finally {
             wlock.unlock();
         }
@@ -355,7 +381,7 @@ public class CacheClient extends NodeDataListener implements CacheAccess {
                 res = Long.parseLong(new String(byteVal));
             } catch (Exception e) {
                 logger.error(e);
-                throw new CacheException(description(e.getMessage()), e);
+                throw new StorageException(description(e.getMessage()), e);
             }
         }
         return res;
@@ -367,7 +393,7 @@ public class CacheClient extends NodeDataListener implements CacheAccess {
         String cacheKey = generateCacheKey(business, key);
         JedisPool pool = locateJedisPool(key);
         if (pool == null) {
-            logger.error(description("CacheClient.incLong() cannot get JedisPool! key:" + key
+            logger.error(description("StorageClient.incLong() cannot get JedisPool! key:" + key
                     + "\tstep:" + step));
             return res;
         }
@@ -383,17 +409,33 @@ public class CacheClient extends NodeDataListener implements CacheAccess {
                 try {
                     pool.returnBrokenResource(jedis);
                 } catch (Exception ex) {
-                    throw new CacheException(description(ex.getMessage()), ex);
+                    throw new StorageException(description(ex.getMessage()), ex);
                 }
             }
-            throw new CacheException(description(e.getMessage()), e);
+            throw new StorageException(description(e.getMessage()), e);
         }
         return res;
     }
+
+    public static void main(String[] args) {
+        BasicConfigurator.configure();
+        StorageClient cc = new StorageClient("test_r", "hotel");
+        try {
+            System.out.println(cc.get("fuck"));
+        } catch (CacheException e1) {
+            // TODO Auto-generated catch block
+            e1.printStackTrace();
+        }
+        try {
+            TimeUnit.SECONDS.sleep(3);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
     /**
      * public static void main(String[] args) {
-     * BasicConfigurator.configure(); CacheClient cc = new
-     * CacheClient("namespace", "hotel");
+     * BasicConfigurator.configure(); StorageClient cc = new
+     * StorageClient("namespace", "hotel");
      * 
      * try { TimeUnit.HOURS.sleep(1); } catch (InterruptedException e) {
      * e.printStackTrace(); } }

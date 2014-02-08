@@ -10,6 +10,8 @@ import org.apache.log4j.Logger;
 public interface Constant {
 
     final String DEFAULT_CACHE_PREFIX = "/cache";
+    
+    final String DEFAULT_STORAGE_PREFIX = "/redis";
 
     final String DIR_SEPARATOR = "/";
 
