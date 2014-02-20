@@ -4,14 +4,11 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Random;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock.ReadLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
 
-import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Logger;
 
 import redis.clients.jedis.Jedis;
@@ -326,7 +323,6 @@ public class StorageClient extends NodeDataListener implements CacheAccess {
                 Continuum cm = new Continuum(business);
                 Map<String, List<JedisPool>> newPoolMap = new HashMap<String, List<JedisPool>>();
                 for (String node : nodes) {
-                    // name:host:port:pwd:timeout
                     String[] fields = node.split(Constant.SEPARATOR);
                     String nickname = fields[0];
                     String host = fields[1];
@@ -416,28 +412,4 @@ public class StorageClient extends NodeDataListener implements CacheAccess {
         }
         return res;
     }
-
-    public static void main(String[] args) {
-        BasicConfigurator.configure();
-        StorageClient cc = new StorageClient("test_r", "hotel");
-        try {
-            System.out.println(cc.get("fuck"));
-        } catch (CacheException e1) {
-            // TODO Auto-generated catch block
-            e1.printStackTrace();
-        }
-        try {
-            TimeUnit.SECONDS.sleep(3);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-    }
-    /**
-     * public static void main(String[] args) {
-     * BasicConfigurator.configure(); StorageClient cc = new
-     * StorageClient("namespace", "hotel");
-     * 
-     * try { TimeUnit.HOURS.sleep(1); } catch (InterruptedException e) {
-     * e.printStackTrace(); } }
-     */
 }

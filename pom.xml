@@ -9,6 +9,12 @@
 	<packaging>jar</packaging>
 	<version>1.0-SNAPSHOT</version>
 	<name>dbaccess</name>
+	<developers>
+		<developer>
+			<name>Michael Lee</name>
+			<email>liyong19861014@gmail.com</email>
+		</developer>
+	</developers>
 	<dependencies>
 		<dependency>
 			<groupId>org.json</groupId>
@@ -67,5 +73,20 @@
 			</plugin>
 		</plugins>
 	</build>
+	<!-- qunar -->
+	<distributionManagement>
+		<repository>
+			<id>releases</id>
+			<name>Qunar Nexus Releases</name>
+			<url>http://svn.corp.qunar.com:8081/nexus/content/repositories/releases</url>
+		</repository>
+		<snapshotRepository>
+			<uniqueVersion>false</uniqueVersion>
+			<id>snapshots</id>
+			<name>Qunar Nexus Snapshots</name>
+			<url>http://svn.corp.qunar.com:8081/nexus/content/repositories/snapshots</url>
+		</snapshotRepository>
+	</distributionManagement>
+	<!-- qunar end -->
 
 </project>
