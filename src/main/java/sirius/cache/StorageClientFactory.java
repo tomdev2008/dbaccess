@@ -16,7 +16,7 @@ public class StorageClientFactory {
 
     private static Map<Entry, StorageClient> entryStorageClientMap = new HashMap<Entry, StorageClient>();
 
-    public static StorageClient getStorageClient(final Entry entry) {
+    public static StorageClient getStorageClient(final Entry entry, String cipher) {
         if (entry == null) {
             logger.error("StorageClientFactory.getStorageClient() arg entry is null!");
             return null;
@@ -24,7 +24,7 @@ public class StorageClientFactory {
         synchronized (StorageClientFactory.class) {
             StorageClient client = entryStorageClientMap.get(entry);
             if (client == null) {
-                client = new StorageClient(entry.getNamespace(), entry.getBusiness());
+                client = new StorageClient(entry.getNamespace(), entry.getBusiness(), cipher);
                 if (client != null) {
                     entryStorageClientMap.put(entry, client);
                 }
@@ -32,5 +32,4 @@ public class StorageClientFactory {
             return client;
         }
     }
-
 }

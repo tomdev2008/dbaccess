@@ -35,6 +35,8 @@ public class StorageClient extends NodeDataListener implements CacheAccess {
 
     private String business;
 
+    private String cipher;
+
     private Continuum continuum;
 
     private Map<String, List<JedisPool>> poolMap;
@@ -46,9 +48,14 @@ public class StorageClient extends NodeDataListener implements CacheAccess {
     private ZkClient zkClient;
 
     public StorageClient(String namespace, String business) {
+        this(namespace, business, "");
+    }
+
+    public StorageClient(String namespace, String business, String cipher) {
         super(Constant.DEFAULT_STORAGE_PREFIX + Constant.DIR_SEPARATOR + namespace);
         this.namespace = namespace;
         this.business = business;
+        this.cipher = cipher;
         this.continuum = new Continuum(business);
         poolMap = new HashMap<String, List<JedisPool>>();
         rand = new Random(System.currentTimeMillis());
@@ -326,7 +333,8 @@ public class StorageClient extends NodeDataListener implements CacheAccess {
                     String[] fields = node.split(Constant.SEPARATOR);
                     String nickname = fields[0];
                     String host = fields[1];
-                    String password = fields[3];
+                    //String password = fields[3];
+                    String password = this.cipher;
                     int port;
                     int timeout;
                     try {

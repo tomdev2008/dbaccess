@@ -32,6 +32,8 @@ public class CacheClient extends NodeDataListener implements CacheAccess {
 
     private String business;
 
+    private String cipher;
+
     private Continuum continuum;
 
     private Map<String, JedisPool> jedisPoolMap; // nick to pool
@@ -41,9 +43,14 @@ public class CacheClient extends NodeDataListener implements CacheAccess {
     private ZkClient zkClient;
 
     public CacheClient(String namespace, String business) {
+        this(namespace, business, "");
+    }
+
+    public CacheClient(String namespace, String business, String cipher) {
         super(Constant.DEFAULT_CACHE_PREFIX + Constant.DIR_SEPARATOR + namespace);
         this.namespace = namespace;
         this.business = business;
+        this.cipher = cipher;
         this.continuum = new Continuum(business);
         jedisPoolMap = new HashMap<String, JedisPool>();
         rwLock = new ReentrantReadWriteLock();
@@ -310,7 +317,8 @@ public class CacheClient extends NodeDataListener implements CacheAccess {
                     String[] fields = node.split(Constant.SEPARATOR);
                     String nickname = fields[0];
                     String host = fields[1];
-                    String password = fields[3];
+                    //String password = fields[3];
+                    String password = this.cipher;
                     int port;
                     int timeout;
                     try {
