@@ -9,13 +9,12 @@ import java.util.concurrent.locks.ReentrantReadWriteLock.ReadLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
 
 /**
+ * 一致性Hash实现
  * 
  * @author liyong19861014@gmail.com
  * 
  */
 public class Continuum {
-
-    //	private static final Comparator comparator = new CompareByPoint();
 
     private String name;
 

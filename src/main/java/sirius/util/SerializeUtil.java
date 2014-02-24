@@ -11,6 +11,10 @@ import org.apache.log4j.Logger;
 import sirius.cache.Constant;
 
 /**
+ * 序列化工具 <br/>
+ * 
+ * 其实，我还是建议用google-protobuf做序列化，优点是：高效、异构！ 缺点是：需要用xxx.proto文件的生成!
+ * 用google-protobuf需要做好工程化，建议proto文件集中管理，但是who knows! Good luck Buddy!
  * 
  * @author liyong19861014@gmail.com
  * 

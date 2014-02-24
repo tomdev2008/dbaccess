@@ -1,12 +1,8 @@
 package sirius.util;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.util.Map;
 
 /**
- * 
+ * 一些小工具而已
  * @author michael
  * @email liyong19861014@gmail.com
  */

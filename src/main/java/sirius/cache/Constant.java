@@ -3,6 +3,8 @@ package sirius.cache;
 import org.apache.log4j.Logger;
 
 /**
+ * 常量表 <br/>
+ * DEFAULT_ZK_ADDRESS需要注意，多个环境都应该有相同的域名
  * 
  * @author michael
  * @email liyong19861014@gmail.com

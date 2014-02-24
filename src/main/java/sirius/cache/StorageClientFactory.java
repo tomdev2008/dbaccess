@@ -6,6 +6,7 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 
 /**
+ * 业务使用此类实例化StorageClient
  * 
  * @author michael
  * @email liyong19861014@gmail.com
