@@ -1,4 +1,4 @@
-package qunar.util;
+package com.qunar.redis.util;
 
 
 /**

@@ -1,4 +1,4 @@
-package qunar.util;
+package com.qunar.redis.util;
 
 /**
  * 标识类，在log4j.xml中配置

@@ -1,4 +1,4 @@
-package qunar.cache.exception;
+package com.qunar.redis.storage.exception;
 
 /**
  * CacheException会包装底层异常，应用层应该catch住此异常

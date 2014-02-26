@@ -1,4 +1,4 @@
-package qunar.cache;
+package com.qunar.redis.storage;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,7 +20,7 @@ public interface Constant {
 
     final String SEPARATOR = ":";
 
-    final Logger logger = LoggerFactory.getLogger(qunar.util.CacheLogger.class);
+    final Logger logger = LoggerFactory.getLogger(com.qunar.redis.util.CacheLogger.class);
 
     final String DEFAULT_ZK_ADDRESS = "127.0.0.1:2181";
 

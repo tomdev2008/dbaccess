@@ -1,8 +1,9 @@
-package qunar.cache;
+package com.qunar.redis.storage;
 
 import java.util.HashMap;
 
-import qunar.util.StringUtil;
+import com.qunar.redis.util.StringUtil;
+
 import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPoolConfig;
 

@@ -1,4 +1,4 @@
-package qunar.cache;
+package com.qunar.redis.storage;
 
 import java.util.HashMap;
 import java.util.Map;

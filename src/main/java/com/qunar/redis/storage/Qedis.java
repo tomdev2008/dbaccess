@@ -1,4 +1,4 @@
-package qunar.cache;
+package com.qunar.redis.storage;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -13,10 +13,6 @@ import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
 
 import org.slf4j.Logger;
 
-import qunar.util.Continuum;
-import qunar.zkclient.ZkClient;
-import qunar.zkclient.exception.ZkException;
-import qunar.zkclient.listener.NodeDataListener;
 import redis.clients.jedis.BinaryClient.LIST_POSITION;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisCommands;
@@ -24,17 +20,22 @@ import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.SortingParams;
 import redis.clients.jedis.Tuple;
 
+import com.qunar.redis.util.Continuum;
+import com.qunar.zkclient.ZkClient;
+import com.qunar.zkclient.exception.ZkException;
+import com.qunar.zkclient.listener.NodeDataListener;
+
 public class Qedis implements JedisCommands {
 
-    private static Logger logger = Constant.logger;
+    private final static Logger logger = Constant.logger;
 
-    private String namespace;
+    private final String namespace;
 
-    private String business;
+    private final String business;
 
-    private String cipher;
+    private final String cipher;
 
-    private Impl impl;
+    private final Impl impl;
 
     public Qedis(String namespace, String business) {
         this(namespace, business, "");

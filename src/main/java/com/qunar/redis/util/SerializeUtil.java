@@ -1,4 +1,4 @@
-package qunar.util;
+package com.qunar.redis.util;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -8,7 +8,8 @@ import java.io.ObjectOutputStream;
 
 import org.slf4j.Logger;
 
-import qunar.cache.Constant;
+import com.qunar.redis.storage.Constant;
+
 
 /**
  * 序列化工具 <br/>
