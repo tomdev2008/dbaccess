@@ -4,7 +4,13 @@
 
 	<modelVersion>4.0.0</modelVersion>
 
-	<groupId>sirius</groupId>
+	<parent>
+		<artifactId>qunar-supom-generic</artifactId>
+		<groupId>qunar.common</groupId>
+		<version>1.3.2</version>
+	</parent>
+
+	<groupId>qunar</groupId>
 	<artifactId>dbaccess</artifactId>
 	<packaging>jar</packaging>
 	<version>1.0-SNAPSHOT</version>
@@ -22,34 +28,23 @@
 			<version>20090211</version>
 		</dependency>
 		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-api</artifactId>
+		</dependency>
+		<dependency>
 			<groupId>log4j</groupId>
-			<artifactId>apache-log4j-extras</artifactId>
-			<version>1.1</version>
+			<artifactId>log4j</artifactId>
+			<version>1.2.15</version>
 		</dependency>
-		<dependency>
-			<groupId>org.openengsb.wrapped</groupId>
-			<artifactId>com.google.guava-all</artifactId>
-			<version>1.1.0.M2</version>
-		</dependency>
-		<dependency>
-			<groupId>mysql</groupId>
-			<artifactId>mysql-connector-java</artifactId>
-			<version>5.1.17</version>
-		</dependency>
-		<dependency>
-			<groupId>com.jolbox</groupId>
-			<artifactId>bonecp</artifactId>
-			<version>0.7.1.RELEASE</version>
-		</dependency>
+		<!-- dependency> <groupId>com.google.guava</groupId> <artifactId>guava</artifactId> 
+			</dependency> <dependency> <groupId>com.jolbox</groupId> <artifactId>bonecp</artifactId> 
+			<version>0.8.0.RELEASE</version> </dependency -->
+		<!-- dependency> <groupId>org.codehaus.jackson</groupId> <artifactId>jackson-core-asl</artifactId> 
+			</dependency> <dependency> <groupId>org.codehaus.jackson</groupId> <artifactId>jackson-mapper-asl</artifactId> 
+			</dependency -->
 		<dependency>
 			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
-			<version>4.11</version>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.zookeeper</groupId>
-			<artifactId>zookeeper</artifactId>
-			<version>3.4.3</version>
+			<artifactId>junit-dep</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>redis.clients</groupId>
@@ -57,22 +52,11 @@
 			<version>2.2.1</version>
 		</dependency>
 		<dependency>
-			<groupId>sirius</groupId>
+			<groupId>qunar</groupId>
 			<artifactId>zkclient</artifactId>
 			<version>1.0-SNAPSHOT</version>
 		</dependency>
 	</dependencies>
-	<build>
-		<plugins>
-			<plugin>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<configuration>
-					<source>1.7</source>
-					<target>1.7</target>
-				</configuration>
-			</plugin>
-		</plugins>
-	</build>
 	<!-- qunar -->
 	<distributionManagement>
 		<repository>
