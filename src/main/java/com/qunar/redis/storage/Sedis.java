@@ -25,36 +25,33 @@ import com.qunar.zkclient.ZkClient;
 import com.qunar.zkclient.exception.ZkException;
 import com.qunar.zkclient.listener.NodeDataListener;
 
-public class Qedis implements JedisCommands {
+public class Sedis implements JedisCommands {
 
     private final static Logger logger = Constant.logger;
 
     private final String namespace;
 
-    private final String business;
-
     private final String cipher;
 
     private final Impl impl;
 
-    public Qedis(String namespace, String business) {
-        this(namespace, business, "");
+    public Sedis(String namespace) {
+        this(namespace, "");
     }
 
-    public Qedis(String namespace, String business, String cipher) {
+    public Sedis(String namespace, String cipher) {
         this.namespace = namespace;
-        this.business = business;
         this.cipher = cipher;
         impl = new Impl(Constant.DEFAULT_STORAGE_PREFIX + Constant.DIR_SEPARATOR + namespace);
     }
 
     private static String generateCacheKey(String prefix, String key) {
-        return prefix + Constant.SEPARATOR + key;
+        return key;
     }
 
     protected String description(String msg) {
         StringBuffer sb = new StringBuffer();
-        sb.append("[ns:").append(namespace).append(",biz:").append(business);
+        sb.append("[ns:").append(namespace);
         if (msg != null) {
             sb.append(", msg:").append(msg);
         }
@@ -76,7 +73,7 @@ public class Qedis implements JedisCommands {
 
         Impl(String path) {
             super(path);
-            this.continuum = new Continuum(business);
+            this.continuum = new Continuum(namespace);
             poolMap = new HashMap<String, List<JedisPool>>();
             rand = new Random(System.currentTimeMillis());
             rwLock = new ReentrantReadWriteLock();
@@ -129,7 +126,7 @@ public class Qedis implements JedisCommands {
                     logger.error(e.getMessage(), e);
                 }
                 if (nodes != null) {
-                    Continuum cm = new Continuum(business);
+                    Continuum cm = new Continuum(namespace);
                     Map<String, List<JedisPool>> newPoolMap = new HashMap<String, List<JedisPool>>();
                     for (String node : nodes) {
                         String[] fields = node.split(Constant.SEPARATOR);
@@ -182,7 +179,7 @@ public class Qedis implements JedisCommands {
 
     @Override
     public Long append(String key, String value) {
-        String cacheKey = generateCacheKey(business, key);
+        String cacheKey = generateCacheKey("", key);
         JedisPool pool = impl.locateJedisPool(key);
         if (pool == null) {
             logger.error(description("Not available JedisPool"));
@@ -206,7 +203,7 @@ public class Qedis implements JedisCommands {
 
     @Override
     public Long bitcount(String key) {
-        String cacheKey = generateCacheKey(business, key);
+        String cacheKey = generateCacheKey("", key);
         JedisPool pool = impl.locateJedisPool(key);
         if (pool == null) {
             logger.error(description("Not available JedisPool"));
@@ -230,7 +227,7 @@ public class Qedis implements JedisCommands {
 
     @Override
     public Long bitcount(String key, long start, long end) {
-        String cacheKey = generateCacheKey(business, key);
+        String cacheKey = generateCacheKey("", key);
         JedisPool pool = impl.locateJedisPool(key);
         if (pool == null) {
             logger.error(description("Not available JedisPool"));
@@ -254,7 +251,7 @@ public class Qedis implements JedisCommands {
 
     @Override
     public List<String> blpop(String key) {
-        String cacheKey = generateCacheKey(business, key);
+        String cacheKey = generateCacheKey("", key);
         JedisPool pool = impl.locateJedisPool(key);
         if (pool == null) {
             logger.error(description("Not available JedisPool"));
@@ -278,7 +275,7 @@ public class Qedis implements JedisCommands {
 
     @Override
     public List<String> brpop(String key) {
-        String cacheKey = generateCacheKey(business, key);
+        String cacheKey = generateCacheKey("", key);
         JedisPool pool = impl.locateJedisPool(key);
         if (pool == null) {
             logger.error(description("Not available JedisPool"));
@@ -302,7 +299,7 @@ public class Qedis implements JedisCommands {
 
     @Override
     public Long decr(String key) {
-        String cacheKey = generateCacheKey(business, key);
+        String cacheKey = generateCacheKey("", key);
         JedisPool pool = impl.locateJedisPool(key);
         if (pool == null) {
             logger.error(description("Not available JedisPool"));
@@ -326,7 +323,7 @@ public class Qedis implements JedisCommands {
 
     @Override
     public Long decrBy(String key, long step) {
-        String cacheKey = generateCacheKey(business, key);
+        String cacheKey = generateCacheKey("", key);
         JedisPool pool = impl.locateJedisPool(key);
         if (pool == null) {
             logger.error(description("Not available JedisPool"));
@@ -350,7 +347,7 @@ public class Qedis implements JedisCommands {
 
     @Override
     public Long del(String key) {
-        String cacheKey = generateCacheKey(business, key);
+        String cacheKey = generateCacheKey("", key);
         JedisPool pool = impl.locateJedisPool(key);
         if (pool == null) {
             logger.error(description("Not available JedisPool"));
@@ -380,7 +377,7 @@ public class Qedis implements JedisCommands {
 
     @Override
     public Boolean exists(String key) {
-        String cacheKey = generateCacheKey(business, key);
+        String cacheKey = generateCacheKey("", key);
         JedisPool pool = impl.locateJedisPool(key);
         if (pool == null) {
             logger.error(description("Not available JedisPool"));
@@ -404,7 +401,7 @@ public class Qedis implements JedisCommands {
 
     @Override
     public Long expire(String key, int seconds) {
-        String cacheKey = generateCacheKey(business, key);
+        String cacheKey = generateCacheKey("", key);
         JedisPool pool = impl.locateJedisPool(key);
         if (pool == null) {
             logger.error(description("Not available JedisPool"));
@@ -428,7 +425,7 @@ public class Qedis implements JedisCommands {
 
     @Override
     public Long expireAt(String key, long unixTime) {
-        String cacheKey = generateCacheKey(business, key);
+        String cacheKey = generateCacheKey("", key);
         JedisPool pool = impl.locateJedisPool(key);
         if (pool == null) {
             logger.error(description("Not available JedisPool"));
@@ -452,7 +449,7 @@ public class Qedis implements JedisCommands {
 
     @Override
     public String get(String key) {
-        String cacheKey = generateCacheKey(business, key);
+        String cacheKey = generateCacheKey("", key);
         JedisPool pool = impl.locateJedisPool(key);
         if (pool == null) {
             logger.error(description("Not available JedisPool"));
@@ -476,7 +473,7 @@ public class Qedis implements JedisCommands {
 
     @Override
     public String getSet(String key, String value) {
-        String cacheKey = generateCacheKey(business, key);
+        String cacheKey = generateCacheKey("", key);
         JedisPool pool = impl.locateJedisPool(key);
         if (pool == null) {
             logger.error(description("Not available JedisPool"));
@@ -500,7 +497,7 @@ public class Qedis implements JedisCommands {
 
     @Override
     public Boolean getbit(String key, long offset) {
-        String cacheKey = generateCacheKey(business, key);
+        String cacheKey = generateCacheKey("", key);
         JedisPool pool = impl.locateJedisPool(key);
         if (pool == null) {
             logger.error(description("Not available JedisPool"));
@@ -524,7 +521,7 @@ public class Qedis implements JedisCommands {
 
     @Override
     public String getrange(String key, long startOffset, long endOffset) {
-        String cacheKey = generateCacheKey(business, key);
+        String cacheKey = generateCacheKey("", key);
         JedisPool pool = impl.locateJedisPool(key);
         if (pool == null) {
             logger.error(description("Not available JedisPool"));
@@ -548,7 +545,7 @@ public class Qedis implements JedisCommands {
 
     @Override
     public Long hdel(String key, String... fields) {
-        String cacheKey = generateCacheKey(business, key);
+        String cacheKey = generateCacheKey("", key);
         JedisPool pool = impl.locateJedisPool(key);
         if (pool == null) {
             logger.error(description("Not available JedisPool"));
@@ -572,7 +569,7 @@ public class Qedis implements JedisCommands {
 
     @Override
     public Boolean hexists(String key, String field) {
-        String cacheKey = generateCacheKey(business, key);
+        String cacheKey = generateCacheKey("", key);
         JedisPool pool = impl.locateJedisPool(key);
         if (pool == null) {
             logger.error(description("Not available JedisPool"));
@@ -596,7 +593,7 @@ public class Qedis implements JedisCommands {
 
     @Override
     public String hget(String key, String field) {
-        String cacheKey = generateCacheKey(business, key);
+        String cacheKey = generateCacheKey("", key);
         JedisPool pool = impl.locateJedisPool(key);
         if (pool == null) {
             logger.error(description("Not available JedisPool"));
@@ -626,7 +623,7 @@ public class Qedis implements JedisCommands {
 
     @Override
     public Long hincrBy(String key, String field, long value) {
-        String cacheKey = generateCacheKey(business, key);
+        String cacheKey = generateCacheKey("", key);
         JedisPool pool = impl.locateJedisPool(key);
         if (pool == null) {
             logger.error(description("Not available JedisPool"));
@@ -650,7 +647,7 @@ public class Qedis implements JedisCommands {
 
     @Override
     public Set<String> hkeys(String key) {
-        String cacheKey = generateCacheKey(business, key);
+        String cacheKey = generateCacheKey("", key);
         JedisPool pool = impl.locateJedisPool(key);
         if (pool == null) {
             logger.error(description("Not available JedisPool"));
@@ -674,7 +671,7 @@ public class Qedis implements JedisCommands {
 
     @Override
     public Long hlen(String key) {
-        String cacheKey = generateCacheKey(business, key);
+        String cacheKey = generateCacheKey("", key);
         JedisPool pool = impl.locateJedisPool(key);
         if (pool == null) {
             logger.error(description("Not available JedisPool"));
@@ -698,7 +695,7 @@ public class Qedis implements JedisCommands {
 
     @Override
     public List<String> hmget(String key, String... fields) {
-        String cacheKey = generateCacheKey(business, key);
+        String cacheKey = generateCacheKey("", key);
         JedisPool pool = impl.locateJedisPool(key);
         if (pool == null) {
             logger.error(description("Not available JedisPool"));
@@ -722,7 +719,7 @@ public class Qedis implements JedisCommands {
 
     @Override
     public String hmset(String key, Map<String, String> hash) {
-        String cacheKey = generateCacheKey(business, key);
+        String cacheKey = generateCacheKey("", key);
         JedisPool pool = impl.locateJedisPool(key);
         if (pool == null) {
             logger.error(description("Not available JedisPool"));
@@ -746,7 +743,7 @@ public class Qedis implements JedisCommands {
 
     @Override
     public Long hset(String key, String field, String value) {
-        String cacheKey = generateCacheKey(business, key);
+        String cacheKey = generateCacheKey("", key);
         JedisPool pool = impl.locateJedisPool(key);
         if (pool == null) {
             logger.error(description("Not available JedisPool"));
@@ -770,7 +767,7 @@ public class Qedis implements JedisCommands {
 
     @Override
     public Long hsetnx(String key, String field, String value) {
-        String cacheKey = generateCacheKey(business, key);
+        String cacheKey = generateCacheKey("", key);
         JedisPool pool = impl.locateJedisPool(key);
         if (pool == null) {
             logger.error(description("Not available JedisPool"));
@@ -794,7 +791,7 @@ public class Qedis implements JedisCommands {
 
     @Override
     public List<String> hvals(String key) {
-        String cacheKey = generateCacheKey(business, key);
+        String cacheKey = generateCacheKey("", key);
         JedisPool pool = impl.locateJedisPool(key);
         if (pool == null) {
             logger.error(description("Not available JedisPool"));
@@ -818,7 +815,7 @@ public class Qedis implements JedisCommands {
 
     @Override
     public Long incr(String key) {
-        String cacheKey = generateCacheKey(business, key);
+        String cacheKey = generateCacheKey("", key);
         JedisPool pool = impl.locateJedisPool(key);
         if (pool == null) {
             logger.error(description("Not available JedisPool"));
@@ -842,7 +839,7 @@ public class Qedis implements JedisCommands {
 
     @Override
     public Long incrBy(String key, long step) {
-        String cacheKey = generateCacheKey(business, key);
+        String cacheKey = generateCacheKey("", key);
         JedisPool pool = impl.locateJedisPool(key);
         if (pool == null) {
             logger.error(description("Not available JedisPool"));
@@ -866,7 +863,7 @@ public class Qedis implements JedisCommands {
 
     @Override
     public String lindex(String key, long index) {
-        String cacheKey = generateCacheKey(business, key);
+        String cacheKey = generateCacheKey("", key);
         JedisPool pool = impl.locateJedisPool(key);
         if (pool == null) {
             logger.error(description("Not available JedisPool"));
@@ -890,7 +887,7 @@ public class Qedis implements JedisCommands {
 
     @Override
     public Long linsert(String key, LIST_POSITION where, String pivot, String value) {
-        String cacheKey = generateCacheKey(business, key);
+        String cacheKey = generateCacheKey("", key);
         JedisPool pool = impl.locateJedisPool(key);
         if (pool == null) {
             logger.error(description("Not available JedisPool"));
@@ -914,7 +911,7 @@ public class Qedis implements JedisCommands {
 
     @Override
     public Long llen(String key) {
-        String cacheKey = generateCacheKey(business, key);
+        String cacheKey = generateCacheKey("", key);
         JedisPool pool = impl.locateJedisPool(key);
         if (pool == null) {
             logger.error(description("Not available JedisPool"));
@@ -938,7 +935,7 @@ public class Qedis implements JedisCommands {
 
     @Override
     public String lpop(String key) {
-        String cacheKey = generateCacheKey(business, key);
+        String cacheKey = generateCacheKey("", key);
         JedisPool pool = impl.locateJedisPool(key);
         if (pool == null) {
             logger.error(description("Not available JedisPool"));
@@ -962,7 +959,7 @@ public class Qedis implements JedisCommands {
 
     @Override
     public Long lpush(String key, String... strings) {
-        String cacheKey = generateCacheKey(business, key);
+        String cacheKey = generateCacheKey("", key);
         JedisPool pool = impl.locateJedisPool(key);
         if (pool == null) {
             logger.error(description("Not available JedisPool"));
@@ -986,7 +983,7 @@ public class Qedis implements JedisCommands {
 
     @Override
     public Long lpushx(String key, String... strings) {
-        String cacheKey = generateCacheKey(business, key);
+        String cacheKey = generateCacheKey("", key);
         JedisPool pool = impl.locateJedisPool(key);
         if (pool == null) {
             logger.error(description("Not available JedisPool"));
@@ -1010,7 +1007,7 @@ public class Qedis implements JedisCommands {
 
     @Override
     public List<String> lrange(String key, long start, long end) {
-        String cacheKey = generateCacheKey(business, key);
+        String cacheKey = generateCacheKey("", key);
         JedisPool pool = impl.locateJedisPool(key);
         if (pool == null) {
             logger.error(description("Not available JedisPool"));
@@ -1034,7 +1031,7 @@ public class Qedis implements JedisCommands {
 
     @Override
     public Long lrem(String key, long count, String value) {
-        String cacheKey = generateCacheKey(business, key);
+        String cacheKey = generateCacheKey("", key);
         JedisPool pool = impl.locateJedisPool(key);
         if (pool == null) {
             logger.error(description("Not available JedisPool"));
@@ -1058,7 +1055,7 @@ public class Qedis implements JedisCommands {
 
     @Override
     public String lset(String key, long index, String value) {
-        String cacheKey = generateCacheKey(business, key);
+        String cacheKey = generateCacheKey("", key);
         JedisPool pool = impl.locateJedisPool(key);
         if (pool == null) {
             logger.error(description("Not available JedisPool"));
@@ -1082,7 +1079,7 @@ public class Qedis implements JedisCommands {
 
     @Override
     public String ltrim(String key, long start, long end) {
-        String cacheKey = generateCacheKey(business, key);
+        String cacheKey = generateCacheKey("", key);
         JedisPool pool = impl.locateJedisPool(key);
         if (pool == null) {
             logger.error(description("Not available JedisPool"));
@@ -1112,7 +1109,7 @@ public class Qedis implements JedisCommands {
 
     @Override
     public Long persist(String key) {
-        String cacheKey = generateCacheKey(business, key);
+        String cacheKey = generateCacheKey("", key);
         JedisPool pool = impl.locateJedisPool(key);
         if (pool == null) {
             logger.error(description("Not available JedisPool"));
@@ -1136,7 +1133,7 @@ public class Qedis implements JedisCommands {
 
     @Override
     public String rpop(String key) {
-        String cacheKey = generateCacheKey(business, key);
+        String cacheKey = generateCacheKey("", key);
         JedisPool pool = impl.locateJedisPool(key);
         if (pool == null) {
             logger.error(description("Not available JedisPool"));
@@ -1160,7 +1157,7 @@ public class Qedis implements JedisCommands {
 
     @Override
     public Long rpush(String key, String... strings) {
-        String cacheKey = generateCacheKey(business, key);
+        String cacheKey = generateCacheKey("", key);
         JedisPool pool = impl.locateJedisPool(key);
         if (pool == null) {
             logger.error(description("Not available JedisPool"));
@@ -1184,7 +1181,7 @@ public class Qedis implements JedisCommands {
 
     @Override
     public Long rpushx(String key, String... strings) {
-        String cacheKey = generateCacheKey(business, key);
+        String cacheKey = generateCacheKey("", key);
         JedisPool pool = impl.locateJedisPool(key);
         if (pool == null) {
             logger.error(description("Not available JedisPool"));
@@ -1208,7 +1205,7 @@ public class Qedis implements JedisCommands {
 
     @Override
     public Long sadd(String key, String... members) {
-        String cacheKey = generateCacheKey(business, key);
+        String cacheKey = generateCacheKey("", key);
         JedisPool pool = impl.locateJedisPool(key);
         if (pool == null) {
             logger.error(description("Not available JedisPool"));
@@ -1232,7 +1229,7 @@ public class Qedis implements JedisCommands {
 
     @Override
     public Long scard(String key) {
-        String cacheKey = generateCacheKey(business, key);
+        String cacheKey = generateCacheKey("", key);
         JedisPool pool = impl.locateJedisPool(key);
         if (pool == null) {
             logger.error(description("Not available JedisPool"));
@@ -1256,7 +1253,7 @@ public class Qedis implements JedisCommands {
 
     @Override
     public String set(String key, String value) {
-        String cacheKey = generateCacheKey(business, key);
+        String cacheKey = generateCacheKey("", key);
         JedisPool pool = impl.locateJedisPool(key);
         if (pool == null) {
             logger.error(description("Not available JedisPool"));
@@ -1280,7 +1277,7 @@ public class Qedis implements JedisCommands {
 
     @Override
     public Boolean setbit(String key, long offset, boolean value) {
-        String cacheKey = generateCacheKey(business, key);
+        String cacheKey = generateCacheKey("", key);
         JedisPool pool = impl.locateJedisPool(key);
         if (pool == null) {
             logger.error(description("Not available JedisPool"));
@@ -1304,7 +1301,7 @@ public class Qedis implements JedisCommands {
 
     @Override
     public Boolean setbit(String key, long offset, String value) {
-        String cacheKey = generateCacheKey(business, key);
+        String cacheKey = generateCacheKey("", key);
         JedisPool pool = impl.locateJedisPool(key);
         if (pool == null) {
             logger.error(description("Not available JedisPool"));
@@ -1328,7 +1325,7 @@ public class Qedis implements JedisCommands {
 
     @Override
     public String setex(String key, int seconds, String value) {
-        String cacheKey = generateCacheKey(business, key);
+        String cacheKey = generateCacheKey("", key);
         JedisPool pool = impl.locateJedisPool(key);
         if (pool == null) {
             logger.error(description("Not available JedisPool"));
@@ -1352,7 +1349,7 @@ public class Qedis implements JedisCommands {
 
     @Override
     public Long setnx(String key, String value) {
-        String cacheKey = generateCacheKey(business, key);
+        String cacheKey = generateCacheKey("", key);
         JedisPool pool = impl.locateJedisPool(key);
         if (pool == null) {
             logger.error(description("Not available JedisPool"));
@@ -1376,7 +1373,7 @@ public class Qedis implements JedisCommands {
 
     @Override
     public Long setrange(String key, long offset, String value) {
-        String cacheKey = generateCacheKey(business, key);
+        String cacheKey = generateCacheKey("", key);
         JedisPool pool = impl.locateJedisPool(key);
         if (pool == null) {
             logger.error(description("Not available JedisPool"));
@@ -1400,7 +1397,7 @@ public class Qedis implements JedisCommands {
 
     @Override
     public Boolean sismember(String key, String member) {
-        String cacheKey = generateCacheKey(business, key);
+        String cacheKey = generateCacheKey("", key);
         JedisPool pool = impl.locateJedisPool(key);
         if (pool == null) {
             logger.error(description("Not available JedisPool"));
@@ -1424,7 +1421,7 @@ public class Qedis implements JedisCommands {
 
     @Override
     public Set<String> smembers(String key) {
-        String cacheKey = generateCacheKey(business, key);
+        String cacheKey = generateCacheKey("", key);
         JedisPool pool = impl.locateJedisPool(key);
         if (pool == null) {
             logger.error(description("Not available JedisPool"));
@@ -1448,7 +1445,7 @@ public class Qedis implements JedisCommands {
 
     @Override
     public List<String> sort(String key) {
-        String cacheKey = generateCacheKey(business, key);
+        String cacheKey = generateCacheKey("", key);
         JedisPool pool = impl.locateJedisPool(key);
         if (pool == null) {
             logger.error(description("Not available JedisPool"));
@@ -1472,7 +1469,7 @@ public class Qedis implements JedisCommands {
 
     @Override
     public List<String> sort(String key, SortingParams sortingParameters) {
-        String cacheKey = generateCacheKey(business, key);
+        String cacheKey = generateCacheKey("", key);
         JedisPool pool = impl.locateJedisPool(key);
         if (pool == null) {
             logger.error(description("Not available JedisPool"));
@@ -1496,7 +1493,7 @@ public class Qedis implements JedisCommands {
 
     @Override
     public String spop(String key) {
-        String cacheKey = generateCacheKey(business, key);
+        String cacheKey = generateCacheKey("", key);
         JedisPool pool = impl.locateJedisPool(key);
         if (pool == null) {
             logger.error(description("Not available JedisPool"));
@@ -1520,7 +1517,7 @@ public class Qedis implements JedisCommands {
 
     @Override
     public String srandmember(String key) {
-        String cacheKey = generateCacheKey(business, key);
+        String cacheKey = generateCacheKey("", key);
         JedisPool pool = impl.locateJedisPool(key);
         if (pool == null) {
             logger.error(description("Not available JedisPool"));
@@ -1544,7 +1541,7 @@ public class Qedis implements JedisCommands {
 
     @Override
     public Long srem(String key, String... members) {
-        String cacheKey = generateCacheKey(business, key);
+        String cacheKey = generateCacheKey("", key);
         JedisPool pool = impl.locateJedisPool(key);
         if (pool == null) {
             logger.error(description("Not available JedisPool"));
@@ -1568,7 +1565,7 @@ public class Qedis implements JedisCommands {
 
     @Override
     public Long strlen(String key) {
-        String cacheKey = generateCacheKey(business, key);
+        String cacheKey = generateCacheKey("", key);
         JedisPool pool = impl.locateJedisPool(key);
         if (pool == null) {
             logger.error(description("Not available JedisPool"));
@@ -1592,7 +1589,7 @@ public class Qedis implements JedisCommands {
 
     @Override
     public String substr(String key, int start, int end) {
-        String cacheKey = generateCacheKey(business, key);
+        String cacheKey = generateCacheKey("", key);
         JedisPool pool = impl.locateJedisPool(key);
         if (pool == null) {
             logger.error(description("Not available JedisPool"));
@@ -1616,7 +1613,7 @@ public class Qedis implements JedisCommands {
 
     @Override
     public Long ttl(String key) {
-        String cacheKey = generateCacheKey(business, key);
+        String cacheKey = generateCacheKey("", key);
         JedisPool pool = impl.locateJedisPool(key);
         if (pool == null) {
             logger.error(description("Not available JedisPool"));
@@ -1640,7 +1637,7 @@ public class Qedis implements JedisCommands {
 
     @Override
     public String type(String key) {
-        String cacheKey = generateCacheKey(business, key);
+        String cacheKey = generateCacheKey("", key);
         JedisPool pool = impl.locateJedisPool(key);
         if (pool == null) {
             logger.error(description("Not available JedisPool"));
@@ -1664,7 +1661,7 @@ public class Qedis implements JedisCommands {
 
     @Override
     public Long zadd(String key, Map<Double, String> scoreMembers) {
-        String cacheKey = generateCacheKey(business, key);
+        String cacheKey = generateCacheKey("", key);
         JedisPool pool = impl.locateJedisPool(key);
         if (pool == null) {
             logger.error(description("Not available JedisPool"));
@@ -1688,7 +1685,7 @@ public class Qedis implements JedisCommands {
 
     @Override
     public Long zadd(String key, double score, String member) {
-        String cacheKey = generateCacheKey(business, key);
+        String cacheKey = generateCacheKey("", key);
         JedisPool pool = impl.locateJedisPool(key);
         if (pool == null) {
             logger.error(description("Not available JedisPool"));
@@ -1712,7 +1709,7 @@ public class Qedis implements JedisCommands {
 
     @Override
     public Long zcard(String key) {
-        String cacheKey = generateCacheKey(business, key);
+        String cacheKey = generateCacheKey("", key);
         JedisPool pool = impl.locateJedisPool(key);
         if (pool == null) {
             logger.error(description("Not available JedisPool"));
@@ -1736,7 +1733,7 @@ public class Qedis implements JedisCommands {
 
     @Override
     public Long zcount(String key, double min, double max) {
-        String cacheKey = generateCacheKey(business, key);
+        String cacheKey = generateCacheKey("", key);
         JedisPool pool = impl.locateJedisPool(key);
         if (pool == null) {
             logger.error(description("Not available JedisPool"));
@@ -1760,7 +1757,7 @@ public class Qedis implements JedisCommands {
 
     @Override
     public Long zcount(String key, String min, String max) {
-        String cacheKey = generateCacheKey(business, key);
+        String cacheKey = generateCacheKey("", key);
         JedisPool pool = impl.locateJedisPool(key);
         if (pool == null) {
             logger.error(description("Not available JedisPool"));
@@ -1784,7 +1781,7 @@ public class Qedis implements JedisCommands {
 
     @Override
     public Double zincrby(String key, double score, String member) {
-        String cacheKey = generateCacheKey(business, key);
+        String cacheKey = generateCacheKey("", key);
         JedisPool pool = impl.locateJedisPool(key);
         if (pool == null) {
             logger.error(description("Not available JedisPool"));
@@ -1809,7 +1806,7 @@ public class Qedis implements JedisCommands {
 
     @Override
     public Set<String> zrange(String key, long start, long end) {
-        String cacheKey = generateCacheKey(business, key);
+        String cacheKey = generateCacheKey("", key);
         JedisPool pool = impl.locateJedisPool(key);
         if (pool == null) {
             logger.error(description("Not available JedisPool"));
@@ -1833,7 +1830,7 @@ public class Qedis implements JedisCommands {
 
     @Override
     public Set<String> zrangeByScore(String key, double start, double end) {
-        String cacheKey = generateCacheKey(business, key);
+        String cacheKey = generateCacheKey("", key);
         JedisPool pool = impl.locateJedisPool(key);
         if (pool == null) {
             logger.error(description("Not available JedisPool"));
@@ -1857,7 +1854,7 @@ public class Qedis implements JedisCommands {
 
     @Override
     public Set<String> zrangeByScore(String key, String min, String max) {
-        String cacheKey = generateCacheKey(business, key);
+        String cacheKey = generateCacheKey("", key);
         JedisPool pool = impl.locateJedisPool(key);
         if (pool == null) {
             logger.error(description("Not available JedisPool"));
@@ -1881,7 +1878,7 @@ public class Qedis implements JedisCommands {
 
     @Override
     public Set<String> zrangeByScore(String key, double min, double max, int offset, int count) {
-        String cacheKey = generateCacheKey(business, key);
+        String cacheKey = generateCacheKey("", key);
         JedisPool pool = impl.locateJedisPool(key);
         if (pool == null) {
             logger.error(description("Not available JedisPool"));
@@ -1905,7 +1902,7 @@ public class Qedis implements JedisCommands {
 
     @Override
     public Set<String> zrangeByScore(String key, String min, String max, int offset, int count) {
-        String cacheKey = generateCacheKey(business, key);
+        String cacheKey = generateCacheKey("", key);
         JedisPool pool = impl.locateJedisPool(key);
         if (pool == null) {
             logger.error(description("Not available JedisPool"));
@@ -1929,7 +1926,7 @@ public class Qedis implements JedisCommands {
 
     @Override
     public Set<Tuple> zrangeByScoreWithScores(String key, double min, double max) {
-        String cacheKey = generateCacheKey(business, key);
+        String cacheKey = generateCacheKey("", key);
         JedisPool pool = impl.locateJedisPool(key);
         if (pool == null) {
             logger.error(description("Not available JedisPool"));
@@ -1953,7 +1950,7 @@ public class Qedis implements JedisCommands {
 
     @Override
     public Set<Tuple> zrangeByScoreWithScores(String key, String min, String max) {
-        String cacheKey = generateCacheKey(business, key);
+        String cacheKey = generateCacheKey("", key);
         JedisPool pool = impl.locateJedisPool(key);
         if (pool == null) {
             logger.error(description("Not available JedisPool"));
@@ -1978,7 +1975,7 @@ public class Qedis implements JedisCommands {
     @Override
     public Set<Tuple> zrangeByScoreWithScores(String key, double min, double max, int offset,
             int count) {
-        String cacheKey = generateCacheKey(business, key);
+        String cacheKey = generateCacheKey("", key);
         JedisPool pool = impl.locateJedisPool(key);
         if (pool == null) {
             logger.error(description("Not available JedisPool"));
@@ -2003,7 +2000,7 @@ public class Qedis implements JedisCommands {
     @Override
     public Set<Tuple> zrangeByScoreWithScores(String key, String min, String max, int offset,
             int count) {
-        String cacheKey = generateCacheKey(business, key);
+        String cacheKey = generateCacheKey("", key);
         JedisPool pool = impl.locateJedisPool(key);
         if (pool == null) {
             logger.error(description("Not available JedisPool"));
@@ -2027,7 +2024,7 @@ public class Qedis implements JedisCommands {
 
     @Override
     public Set<Tuple> zrangeWithScores(String key, long start, long end) {
-        String cacheKey = generateCacheKey(business, key);
+        String cacheKey = generateCacheKey("", key);
         JedisPool pool = impl.locateJedisPool(key);
         if (pool == null) {
             logger.error(description("Not available JedisPool"));
@@ -2051,7 +2048,7 @@ public class Qedis implements JedisCommands {
 
     @Override
     public Long zrank(String key, String member) {
-        String cacheKey = generateCacheKey(business, key);
+        String cacheKey = generateCacheKey("", key);
         JedisPool pool = impl.locateJedisPool(key);
         if (pool == null) {
             logger.error(description("Not available JedisPool"));
@@ -2075,7 +2072,7 @@ public class Qedis implements JedisCommands {
 
     @Override
     public Long zrem(String key, String... members) {
-        String cacheKey = generateCacheKey(business, key);
+        String cacheKey = generateCacheKey("", key);
         JedisPool pool = impl.locateJedisPool(key);
         if (pool == null) {
             logger.error(description("Not available JedisPool"));
@@ -2099,7 +2096,7 @@ public class Qedis implements JedisCommands {
 
     @Override
     public Long zremrangeByRank(String key, long start, long end) {
-        String cacheKey = generateCacheKey(business, key);
+        String cacheKey = generateCacheKey("", key);
         JedisPool pool = impl.locateJedisPool(key);
         if (pool == null) {
             logger.error(description("Not available JedisPool"));
@@ -2123,7 +2120,7 @@ public class Qedis implements JedisCommands {
 
     @Override
     public Long zremrangeByScore(String key, double start, double end) {
-        String cacheKey = generateCacheKey(business, key);
+        String cacheKey = generateCacheKey("", key);
         JedisPool pool = impl.locateJedisPool(key);
         if (pool == null) {
             logger.error(description("Not available JedisPool"));
@@ -2147,7 +2144,7 @@ public class Qedis implements JedisCommands {
 
     @Override
     public Long zremrangeByScore(String key, String start, String end) {
-        String cacheKey = generateCacheKey(business, key);
+        String cacheKey = generateCacheKey("", key);
         JedisPool pool = impl.locateJedisPool(key);
         if (pool == null) {
             logger.error(description("Not available JedisPool"));
@@ -2171,7 +2168,7 @@ public class Qedis implements JedisCommands {
 
     @Override
     public Set<String> zrevrange(String key, long start, long end) {
-        String cacheKey = generateCacheKey(business, key);
+        String cacheKey = generateCacheKey("", key);
         JedisPool pool = impl.locateJedisPool(key);
         if (pool == null) {
             logger.error(description("Not available JedisPool"));
@@ -2195,7 +2192,7 @@ public class Qedis implements JedisCommands {
 
     @Override
     public Set<String> zrevrangeByScore(String key, double max, double min) {
-        String cacheKey = generateCacheKey(business, key);
+        String cacheKey = generateCacheKey("", key);
         JedisPool pool = impl.locateJedisPool(key);
         if (pool == null) {
             logger.error(description("Not available JedisPool"));
@@ -2219,7 +2216,7 @@ public class Qedis implements JedisCommands {
 
     @Override
     public Set<String> zrevrangeByScore(String key, String max, String min) {
-        String cacheKey = generateCacheKey(business, key);
+        String cacheKey = generateCacheKey("", key);
         JedisPool pool = impl.locateJedisPool(key);
         if (pool == null) {
             logger.error(description("Not available JedisPool"));
@@ -2243,7 +2240,7 @@ public class Qedis implements JedisCommands {
 
     @Override
     public Set<String> zrevrangeByScore(String key, double max, double min, int offset, int count) {
-        String cacheKey = generateCacheKey(business, key);
+        String cacheKey = generateCacheKey("", key);
         JedisPool pool = impl.locateJedisPool(key);
         if (pool == null) {
             logger.error(description("Not available JedisPool"));
@@ -2267,7 +2264,7 @@ public class Qedis implements JedisCommands {
 
     @Override
     public Set<String> zrevrangeByScore(String key, String max, String min, int offset, int count) {
-        String cacheKey = generateCacheKey(business, key);
+        String cacheKey = generateCacheKey("", key);
         JedisPool pool = impl.locateJedisPool(key);
         if (pool == null) {
             logger.error(description("Not available JedisPool"));
@@ -2291,7 +2288,7 @@ public class Qedis implements JedisCommands {
 
     @Override
     public Set<Tuple> zrevrangeByScoreWithScores(String key, double max, double min) {
-        String cacheKey = generateCacheKey(business, key);
+        String cacheKey = generateCacheKey("", key);
         JedisPool pool = impl.locateJedisPool(key);
         if (pool == null) {
             logger.error(description("Not available JedisPool"));
@@ -2315,7 +2312,7 @@ public class Qedis implements JedisCommands {
 
     @Override
     public Set<Tuple> zrevrangeByScoreWithScores(String key, String max, String min) {
-        String cacheKey = generateCacheKey(business, key);
+        String cacheKey = generateCacheKey("", key);
         JedisPool pool = impl.locateJedisPool(key);
         if (pool == null) {
             logger.error(description("Not available JedisPool"));
@@ -2340,7 +2337,7 @@ public class Qedis implements JedisCommands {
     @Override
     public Set<Tuple> zrevrangeByScoreWithScores(String key, double max, double min, int offset,
             int count) {
-        String cacheKey = generateCacheKey(business, key);
+        String cacheKey = generateCacheKey("", key);
         JedisPool pool = impl.locateJedisPool(key);
         if (pool == null) {
             logger.error(description("Not available JedisPool"));
@@ -2365,7 +2362,7 @@ public class Qedis implements JedisCommands {
     @Override
     public Set<Tuple> zrevrangeByScoreWithScores(String key, String max, String min, int offset,
             int count) {
-        String cacheKey = generateCacheKey(business, key);
+        String cacheKey = generateCacheKey("", key);
         JedisPool pool = impl.locateJedisPool(key);
         if (pool == null) {
             logger.error(description("Not available JedisPool"));
@@ -2389,7 +2386,7 @@ public class Qedis implements JedisCommands {
 
     @Override
     public Set<Tuple> zrevrangeWithScores(String key, long start, long end) {
-        String cacheKey = generateCacheKey(business, key);
+        String cacheKey = generateCacheKey("", key);
         JedisPool pool = impl.locateJedisPool(key);
         if (pool == null) {
             logger.error(description("Not available JedisPool"));
@@ -2413,7 +2410,7 @@ public class Qedis implements JedisCommands {
 
     @Override
     public Long zrevrank(String key, String member) {
-        String cacheKey = generateCacheKey(business, key);
+        String cacheKey = generateCacheKey("", key);
         JedisPool pool = impl.locateJedisPool(key);
         if (pool == null) {
             logger.error(description("Not available JedisPool"));
@@ -2437,7 +2434,7 @@ public class Qedis implements JedisCommands {
 
     @Override
     public Double zscore(String key, String member) {
-        String cacheKey = generateCacheKey(business, key);
+        String cacheKey = generateCacheKey("", key);
         JedisPool pool = impl.locateJedisPool(key);
         if (pool == null) {
             logger.error(description("Not available JedisPool"));
