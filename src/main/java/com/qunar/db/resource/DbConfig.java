@@ -320,7 +320,7 @@ public class DbConfig extends NodeDataListener implements ConnectionAccess {
             ds.setLazyInit(true);
             ds.setDisableJMX(true);
             ds.setPoolAvailabilityThreshold(10);
-            logger.debug("ds:" + ds.toString());
+            ds.setServiceOrder("LIFO");
             this.dataSource = ds;
         }
 
