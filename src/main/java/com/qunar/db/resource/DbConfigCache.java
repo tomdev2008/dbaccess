@@ -1,12 +1,8 @@
 package com.qunar.db.resource;
 
-import java.sql.Connection;
-import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 
-import org.apache.log4j.BasicConfigurator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,37 +32,6 @@ public class DbConfigCache {
                 dbConfigMap.put(ns, config);
             }
             return config;
-        }
-    }
-
-    public static void main(String[] args) {
-        BasicConfigurator.configure();
-        DbConfig config = DbConfigCache.getConfig("test2", "");
-        int loop = 0;
-        while (true) {
-            Connection readConn = null;
-            try {
-                readConn = config.getReadConnection();
-                logger.debug("loop=" + loop++ + "\treadConn.isValid(): " + readConn.isValid(5000)
-                        + "\treadConn:" + readConn.toString());
-            } catch (Exception e) {
-                logger.error(e.getMessage(), e);
-            } finally {
-                if (readConn != null) {
-                    try {
-                        readConn.close();
-                    } catch (SQLException e) {
-                        logger.error(e.getMessage(), e);
-                    }
-                }
-            }
-
-            try {
-                TimeUnit.SECONDS.sleep(3);
-            } catch (InterruptedException e) {
-                logger.error(e.getMessage(), e);
-            }
-
         }
     }
 }
