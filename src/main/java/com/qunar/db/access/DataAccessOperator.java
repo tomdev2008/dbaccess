@@ -3,12 +3,10 @@ package com.qunar.db.access;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.log4j.BasicConfigurator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,8 +34,8 @@ public class DataAccessOperator {
     public DataAccessOperator(String namespace, String cipher) {
         this.namespace = namespace;
         this.cipher = cipher;
-        this.readOnlyDataSource = new ReadOnlyDataSource(namespace, cipher);
-        this.readWriteDataSource = new ReadWriteDataSource(namespace, cipher);
+        this.readOnlyDataSource = new ReadOnlyDataSource(this.namespace, this.cipher);
+        this.readWriteDataSource = new ReadWriteDataSource(this.namespace, this.cipher);
     }
 
     protected String desc(String msg) {
