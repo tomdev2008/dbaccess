@@ -1,6 +1,9 @@
 package com.qunar.db.resource;
 
+import java.io.Closeable;
+import java.io.IOException;
 import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -14,14 +17,8 @@ import com.qunar.db.util.DbLogger;
 import com.qunar.redis.storage.Constant;
 import com.qunar.zkclient.ZkClient;
 import com.qunar.zkclient.exception.ZkException;
-import com.qunar.zkclient.listener.NodeDataListener;
 
-/**
- * 
- * @author michael
- * @email liyong19861014@gmail.com
- */
-public class DbConfig extends NodeDataListener implements ConnectionAccess {
+public class ReadOnlyDataSource extends BasicDataSource implements Closeable {
 
     private static final Logger logger = LoggerFactory.getLogger(DbLogger.class);
 
@@ -35,18 +32,18 @@ public class DbConfig extends NodeDataListener implements ConnectionAccess {
 
     private List<Entry> readEntries;
 
-    private List<Entry> writeEntries;
-
     private ZkClient zkClient;
 
-    public DbConfig(String namespace, String cipher) {
-        super(DATABASE_DESC_PREFIX + namespace);
+    private boolean closed;
+
+    public ReadOnlyDataSource(String namespace, String cipher) {
+        super(ConnectionAccess.DATABASE_DESC_PREFIX + namespace);
         this.namespace = namespace;
         this.cipher = cipher;
         this.rand = new Random(System.currentTimeMillis());
         this.rwlock = new ReentrantReadWriteLock();
         this.readEntries = new LinkedList<Entry>();
-        this.writeEntries = new LinkedList<Entry>();
+        this.closed = false;
         //        this.zkClient = ZkClient.getInstance(Constant.DEFAULT_ZK_ADDRESS);
         this.zkClient = ZkClient.getInstance("127.0.0.1:2181");
         zkClient.addNodeDataListener(this);
@@ -56,10 +53,21 @@ public class DbConfig extends NodeDataListener implements ConnectionAccess {
             logger.error(desc(e.getMessage()), e);
         }
         update(getNodePath());
+
+    }
+
+    protected String desc(String msg) {
+        StringBuffer sb = new StringBuffer();
+        sb.append("[ns:").append(namespace);
+        if (msg != null) {
+            sb.append(", msg:").append(msg);
+        }
+        sb.append("]");
+        return sb.toString();
     }
 
     @Override
-    public Connection getReadConnection() throws Exception {
+    public Connection getConnection() throws SQLException {
         if (readEntries.isEmpty()) {
             return null;
         }
@@ -78,61 +86,10 @@ public class DbConfig extends NodeDataListener implements ConnectionAccess {
     }
 
     @Override
-    public Connection getReadConnection(String pattern) throws Exception {
-        if (readEntries.isEmpty()) {
-            return null;
-        }
-        try {
-            rwlock.readLock().lock();
-            Connection conn = null;
-            for (Entry entry : readEntries) {
-                if (entry.match(pattern)) {
-                    conn = entry.getConnection();
-                    break;
-                }
-            }
-            return conn;
-        } finally {
-            rwlock.readLock().unlock();
-        }
-    }
-
-    @Override
-    public Connection getWriteConnection() throws Exception {
-        if (writeEntries.isEmpty()) {
-            return null;
-        }
-        try {
-            rwlock.readLock().lock();
-            return writeEntries.get(0).getConnection();
-        } finally {
-            rwlock.readLock().unlock();
-        }
-    }
-
-    @Override
-    public Connection getWriteConnection(String pattern) throws Exception {
-        if (writeEntries.isEmpty()) {
-            return null;
-        }
-        try {
-            rwlock.readLock().lock();
-            Connection conn = null;
-            for (Entry entry : writeEntries) {
-                if (entry.match(pattern)) {
-                    conn = entry.getConnection();
-                    break;
-                }
-            }
-            return conn;
-        } finally {
-            rwlock.readLock().unlock();
-        }
-
-    }
-
-    @Override
     public boolean update(String value) {
+        if (closed) {
+            return true;
+        }
         try {
             rwlock.writeLock().lock();
             if (zkClient == null) {
@@ -152,7 +109,6 @@ public class DbConfig extends NodeDataListener implements ConnectionAccess {
             }
 
             List<Entry> newReadEntries = new ArrayList<Entry>();
-            List<Entry> newWriteEntries = new ArrayList<Entry>();
             for (String node : nodes) {
                 // <host>:<port>:<user>:<pwd>:<db>:<flag>:<pattern_str>:<core>:<max>
                 //      0:     1:     2:    3:   4:     5:            6:     7:    8
@@ -182,22 +138,18 @@ public class DbConfig extends NodeDataListener implements ConnectionAccess {
                     logger.error(desc(e.getMessage()), e);
                 }
                 try {
-                    Entry entry = new Entry(host, port, user, pwd, flag, patternStr, db, core, max);
-                    if (entry.isWritable()) {
-                        newWriteEntries.add(entry);
-                    } else {
+                    if (flag != null && flag.contains(ConnectionAccess.READ_FLAG)) {
+                        Entry entry = new Entry(host, port, user, pwd, flag, patternStr, db, core,
+                                max);
                         newReadEntries.add(entry);
                     }
                 } catch (Exception e) {
                     logger.error(desc(e.getMessage()), e);
                 }
             }
-
             // apply to new read/write entries
-            logger.debug(desc(String.format(
-                    "oldReadSize=%d,oldWriteSize=%d,newReadSize=%d,newWriteSize=%d",
-                    readEntries.size(), newReadEntries.size(), writeEntries.size(),
-                    newWriteEntries.size())));
+            logger.debug(desc(String.format("oldReadSize=%d,newReadSize=%d", readEntries.size(),
+                    newReadEntries.size())));
             List<Entry> oldReadEntries = readEntries;
             readEntries = newReadEntries;
             // destroy old read entries
@@ -209,18 +161,6 @@ public class DbConfig extends NodeDataListener implements ConnectionAccess {
                 }
             }
             oldReadEntries.clear();
-
-            List<Entry> oldWriteEntries = writeEntries;
-            writeEntries = newWriteEntries;
-            // destroy old write entries
-            for (Entry entry : oldWriteEntries) {
-                try {
-                    entry.closeDataSource();
-                } catch (Exception e) {
-                    logger.error(desc(e.getMessage()), e);
-                }
-            }
-            oldWriteEntries.clear();
         } finally {
             rwlock.writeLock().unlock();
         }
@@ -229,17 +169,23 @@ public class DbConfig extends NodeDataListener implements ConnectionAccess {
 
     @Override
     public boolean delete() {
-        // do nothing
         return true;
     }
 
-    protected String desc(String msg) {
-        StringBuffer sb = new StringBuffer();
-        sb.append("[ns:").append(namespace);
-        if (msg != null) {
-            sb.append(", msg:").append(msg);
+    @Override
+    public void close() throws IOException {
+        try {
+            rwlock.writeLock().lock();
+            this.closed = true;
+            for (Entry entry : readEntries) {
+                try {
+                    entry.closeDataSource();
+                } catch (Exception e) {
+                    logger.error(desc(e.getMessage()), e);
+                }
+            }
+        } finally {
+            rwlock.writeLock().unlock();
         }
-        sb.append("]");
-        return sb.toString();
     }
 }
