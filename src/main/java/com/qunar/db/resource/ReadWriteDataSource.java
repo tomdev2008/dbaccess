@@ -44,8 +44,7 @@ public class ReadWriteDataSource extends BasicDataSource implements Closeable {
         this.rwlock = new ReentrantReadWriteLock();
         this.writeEntries = new LinkedList<Entry>();
         this.closed = false;
-        //        this.zkClient = ZkClient.getInstance(Constant.DEFAULT_ZK_ADDRESS);
-        this.zkClient = ZkClient.getInstance("127.0.0.1:2181");
+        this.zkClient = ZkClient.getInstance(Constant.DEFAULT_ZK_ADDRESS);
         zkClient.addNodeDataListener(this);
         try {
             zkClient.exist(getNodePath(), true);
