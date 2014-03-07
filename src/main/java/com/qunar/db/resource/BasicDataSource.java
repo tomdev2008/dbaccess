@@ -43,7 +43,6 @@ public abstract class BasicDataSource extends NodeDataListener implements DataSo
         throw new UnsupportedOperationException("getLoginTimeout is unsupported.");
     }
 
-    @Override
     public Logger getParentLogger() throws SQLFeatureNotSupportedException {
         throw new UnsupportedOperationException("getParentLogger is unsupported");
     }
