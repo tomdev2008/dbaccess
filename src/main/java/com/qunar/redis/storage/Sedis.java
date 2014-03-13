@@ -1,6 +1,7 @@
 package com.qunar.redis.storage;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -27,6 +28,8 @@ import com.qunar.zkclient.exception.ZkException;
 import com.qunar.zkclient.listener.NodeDataListener;
 
 public class Sedis implements JedisCommands {
+
+    public final static int HASH_ELEMENT_MAX_SIZE = 5000;
 
     private final static Logger logger = Constant.logger;
 
@@ -736,6 +739,301 @@ public class Sedis implements JedisCommands {
         return removedSize;
     }
 
+    public Long hset(byte[] key, byte[] field, byte[] value) {
+        byte[] cacheKey = generateCacheKey("", key);
+        JedisPool pool = impl.locateJedisPool(key);
+        if (pool == null) {
+            logger.error(description("Not available JedisPool"));
+            return null;
+        }
+        Jedis jedis = null;
+        Long ok = 0L;
+        try {
+            jedis = pool.getResource();
+            if (jedis != null) {
+                ok = jedis.hset(cacheKey, field, value);
+            }
+            pool.returnResource(jedis);
+        } catch (Exception e) {
+            if (jedis != null) {
+                pool.returnBrokenResource(jedis);
+            }
+            throw new CacheException(e);
+        }
+        return ok;
+    }
+
+    public byte[] hget(byte[] key, byte[] field) {
+        byte[] cacheKey = generateCacheKey("", key);
+        JedisPool pool = impl.locateJedisPool(key);
+        if (pool == null) {
+            logger.error(description("Not available JedisPool"));
+            return null;
+        }
+        byte[] value = null;
+        Jedis jedis = null;
+        try {
+            jedis = pool.getResource();
+            if (jedis != null) {
+                value = jedis.hget(cacheKey, field);
+            }
+            pool.returnResource(jedis);
+        } catch (Exception e) {
+            if (jedis != null) {
+                pool.returnBrokenResource(jedis);
+            }
+            throw new CacheException(e);
+        }
+        return value;
+    }
+
+    public Long hsetnx(byte[] key, byte[] field, byte[] value) {
+        byte[] cacheKey = generateCacheKey("", key);
+        JedisPool pool = impl.locateJedisPool(key);
+        if (pool == null) {
+            logger.error(description("Not available JedisPool"));
+            return null;
+        }
+        Jedis jedis = null;
+        Long ok = 0L;
+        try {
+            jedis = pool.getResource();
+            if (jedis != null) {
+                ok = jedis.hsetnx(cacheKey, field, value);
+            }
+            pool.returnResource(jedis);
+        } catch (Exception e) {
+            if (jedis != null) {
+                pool.returnBrokenResource(jedis);
+            }
+            throw new CacheException(e);
+        }
+        return ok;
+    }
+
+    public String hmset(byte[] key, Map<byte[], byte[]> hash) {
+        byte[] cacheKey = generateCacheKey("", key);
+        JedisPool pool = impl.locateJedisPool(key);
+        if (pool == null) {
+            logger.error(description("Not available JedisPool"));
+            return null;
+        }
+        String ok = "";
+        Jedis jedis = null;
+        try {
+            jedis = pool.getResource();
+            if (jedis != null) {
+                ok = jedis.hmset(cacheKey, hash);
+            }
+            pool.returnResource(jedis);
+        } catch (Exception e) {
+            if (jedis != null) {
+                pool.returnBrokenResource(jedis);
+            }
+            throw new CacheException(e);
+        }
+        return ok;
+    }
+
+    public List<byte[]> hmget(byte[] key, byte[]... fields) {
+        byte[] cacheKey = generateCacheKey("", key);
+        JedisPool pool = impl.locateJedisPool(key);
+        if (pool == null) {
+            logger.error(description("Not available JedisPool"));
+            return null;
+        }
+        Jedis jedis = null;
+        List<byte[]> values = new ArrayList<byte[]>();
+        try {
+            jedis = pool.getResource();
+            if (jedis != null) {
+                values.addAll(jedis.hmget(cacheKey, fields));
+            }
+            pool.returnResource(jedis);
+        } catch (Exception e) {
+            if (jedis != null) {
+                pool.returnBrokenResource(jedis);
+            }
+            throw new CacheException(e);
+        }
+        return values;
+    }
+
+    public Long hincrBy(byte[] key, byte[] field, long value) {
+        byte[] cacheKey = generateCacheKey("", key);
+        JedisPool pool = impl.locateJedisPool(key);
+        if (pool == null) {
+            logger.error(description("Not available JedisPool"));
+            return null;
+        }
+        Long v = 0L;
+        Jedis jedis = null;
+        try {
+            jedis = pool.getResource();
+            if (jedis != null) {
+                v = jedis.hincrBy(cacheKey, field, value);
+            }
+            pool.returnResource(jedis);
+        } catch (Exception e) {
+            if (jedis != null) {
+                pool.returnBrokenResource(jedis);
+            }
+            throw new CacheException(e);
+        }
+        return v;
+
+    }
+
+    public Boolean hexists(byte[] key, byte[] field) {
+        byte[] cacheKey = generateCacheKey("", key);
+        JedisPool pool = impl.locateJedisPool(key);
+        if (pool == null) {
+            logger.error(description("Not available JedisPool"));
+            return null;
+        }
+        Boolean ex = false;
+        Jedis jedis = null;
+        try {
+            jedis = pool.getResource();
+            if (jedis != null) {
+                ex = jedis.hexists(cacheKey, field);
+            }
+            pool.returnResource(jedis);
+        } catch (Exception e) {
+            if (jedis != null) {
+                pool.returnBrokenResource(jedis);
+            }
+            throw new CacheException(e);
+        }
+        return ex;
+    }
+
+    public Long hdel(byte[] key, byte[]... fields) {
+        byte[] cacheKey = generateCacheKey("", key);
+        JedisPool pool = impl.locateJedisPool(key);
+        if (pool == null) {
+            logger.error(description("Not available JedisPool"));
+            return null;
+        }
+        Long removedSize = 0L;
+        Jedis jedis = null;
+        try {
+            jedis = pool.getResource();
+            if (jedis != null) {
+                removedSize = jedis.hdel(cacheKey, fields);
+            }
+            pool.returnResource(jedis);
+        } catch (Exception e) {
+            if (jedis != null) {
+                pool.returnBrokenResource(jedis);
+            }
+            throw new CacheException(e);
+        }
+        return removedSize;
+    }
+
+    public Long hlen(byte[] key) {
+        byte[] cacheKey = generateCacheKey("", key);
+        JedisPool pool = impl.locateJedisPool(key);
+        if (pool == null) {
+            logger.error(description("Not available JedisPool"));
+            return null;
+        }
+        Long len = 0L;
+        Jedis jedis = null;
+        try {
+            jedis = pool.getResource();
+            if (jedis != null) {
+                len = jedis.hlen(cacheKey);
+            }
+            pool.returnResource(jedis);
+        } catch (Exception e) {
+            if (jedis != null) {
+                pool.returnBrokenResource(jedis);
+            }
+            throw new CacheException(e);
+        }
+        return len;
+    }
+
+    public Set<byte[]> hkeys(byte[] key) {
+        byte[] cacheKey = generateCacheKey("", key);
+        JedisPool pool = impl.locateJedisPool(key);
+        if (pool == null) {
+            logger.error(description("Not available JedisPool"));
+            return null;
+        }
+        Jedis jedis = null;
+        Set<byte[]> keys = null;;
+        try {
+            jedis = pool.getResource();
+            if (jedis != null) {
+                keys = jedis.hkeys(cacheKey);
+            }
+            pool.returnResource(jedis);
+        } catch (Exception e) {
+            if (jedis != null) {
+                pool.returnBrokenResource(jedis);
+            }
+            throw new CacheException(e);
+        }
+        return keys;
+    }
+
+    public Collection<byte[]> hvals(byte[] key) {
+        byte[] cacheKey = generateCacheKey("", key);
+        JedisPool pool = impl.locateJedisPool(key);
+        if (pool == null) {
+            logger.error(description("Not available JedisPool"));
+            return null;
+        }
+        Jedis jedis = null;
+        List<byte[]> values = new ArrayList<byte[]>();
+        try {
+            jedis = pool.getResource();
+            if (jedis != null) {
+                values.addAll(jedis.hvals(cacheKey));
+            }
+            pool.returnResource(jedis);
+        } catch (Exception e) {
+            if (jedis != null) {
+                pool.returnBrokenResource(jedis);
+            }
+            throw new CacheException(e);
+        }
+        return values;
+
+    }
+
+    public Map<byte[], byte[]> hgetAll(byte[] key) {
+        byte[] cacheKey = generateCacheKey("", key);
+        JedisPool pool = impl.locateJedisPool(key);
+        if (pool == null) {
+            logger.error(description("Not available JedisPool"));
+            return null;
+        }
+        Map<byte[], byte[]> value = new HashMap<byte[], byte[]>();
+        Jedis jedis = null;
+        try {
+            jedis = pool.getResource();
+            if (jedis != null) {
+                value = jedis.hgetAll(cacheKey);
+            }
+            pool.returnResource(jedis);
+        } catch (Exception e) {
+            if (jedis != null) {
+                pool.returnBrokenResource(jedis);
+            }
+            throw new CacheException(e);
+        }
+        if (value.size() >= HASH_ELEMENT_MAX_SIZE) {
+            logger.warn(description("key:" + key
+                    + ", type:hash, contains two many (field, value) elements"));
+        }
+        return value;
+
+    }
+
     /* binary commands end */
 
     @Override
@@ -1195,9 +1493,32 @@ public class Sedis implements JedisCommands {
     }
 
     @Override
-    public Map<String, String> hgetAll(String arg0) {
-        // 先不实现了，太危险
-        return null;
+    public Map<String, String> hgetAll(String key) {
+        String cacheKey = generateCacheKey("", key);
+        JedisPool pool = impl.locateJedisPool(key);
+        if (pool == null) {
+            logger.error(description("Not available JedisPool"));
+            return null;
+        }
+        Map<String, String> value = new HashMap<String, String>();
+        Jedis jedis = null;
+        try {
+            jedis = pool.getResource();
+            if (jedis != null) {
+                value = jedis.hgetAll(cacheKey);
+            }
+            pool.returnResource(jedis);
+        } catch (Exception e) {
+            if (jedis != null) {
+                pool.returnBrokenResource(jedis);
+            }
+            throw new CacheException(e);
+        }
+        if (value.size() >= HASH_ELEMENT_MAX_SIZE) {
+            logger.warn(description("key:" + key
+                    + ", type:hash, contains two many (field, value) elements"));
+        }
+        return value;
     }
 
     @Override
