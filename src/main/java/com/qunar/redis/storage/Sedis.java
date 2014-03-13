@@ -49,6 +49,10 @@ public class Sedis implements JedisCommands {
         return key;
     }
 
+    private static byte[] generateCacheKey(String prefix, byte[] key) {
+        return key;
+    }
+
     protected String description(String msg) {
         StringBuffer sb = new StringBuffer();
         sb.append("[ns:").append(namespace);
@@ -89,6 +93,28 @@ public class Sedis implements JedisCommands {
 
         protected JedisPool locateJedisPool(String key) {
             String nickname = continuum.locate(Continuum.hash(key));
+            ReadLock rlock = rwLock.readLock();
+            try {
+                rlock.lock();
+                List<JedisPool> pools = poolMap.get(nickname);
+                if (pools == null || pools.isEmpty()) {
+                    return null;
+                } else {
+                    int size = pools.size();
+                    if (size == 1) { //needn't to get randomly
+                        return pools.get(0);
+                    } else {
+                        return pools.get(rand.nextInt(size));
+                    }
+
+                }
+            } finally {
+                rlock.unlock();
+            }
+        }
+
+        protected JedisPool locateJedisPool(byte[] key) {
+            String nickname = continuum.locate(Continuum.hash(key, key.length));
             ReadLock rlock = rwLock.readLock();
             try {
                 rlock.lock();
@@ -176,6 +202,518 @@ public class Sedis implements JedisCommands {
         }
 
     }
+
+    /* binary commands start*/
+
+    public byte[] get(byte[] key) {
+        byte[] cacheKey = generateCacheKey("", key);
+        JedisPool pool = impl.locateJedisPool(cacheKey);
+        if (pool == null) {
+            logger.error(description("Not available JedisPool"));
+            return null;
+        }
+        byte[] value = null;
+        Jedis jedis = null;
+        try {
+            jedis = pool.getResource();
+            if (jedis != null) {
+                value = jedis.get(key);
+            }
+            pool.returnResource(jedis);
+        } catch (Exception e) {
+            if (jedis != null) {
+                pool.returnBrokenResource(jedis);
+            }
+        }
+        return value;
+    }
+
+    public String set(byte[] key, byte[] value) {
+        byte[] cacheKey = generateCacheKey("", key);
+        JedisPool pool = impl.locateJedisPool(key);
+        if (pool == null) {
+            logger.error(description("Not available JedisPool"));
+            return null;
+        }
+        String ok = "";
+        Jedis jedis = null;
+        try {
+            jedis = pool.getResource();
+            if (jedis != null) {
+                ok = jedis.set(cacheKey, value);
+            }
+            pool.returnResource(jedis);
+        } catch (Exception e) {
+            if (jedis != null) {
+                pool.returnBrokenResource(jedis);
+            }
+        }
+        return ok;
+
+    }
+
+    public Boolean exists(byte[] key) {
+        byte[] cacheKey = generateCacheKey("", key);
+        JedisPool pool = impl.locateJedisPool(key);
+        if (pool == null) {
+            logger.error(description("Not available JedisPool"));
+            return null;
+        }
+        Boolean ex = false;
+        Jedis jedis = null;
+        try {
+            jedis = pool.getResource();
+            if (jedis != null) {
+                ex = jedis.exists(cacheKey);
+            }
+            pool.returnResource(jedis);
+        } catch (Exception e) {
+            if (jedis != null) {
+                pool.returnBrokenResource(jedis);
+            }
+        }
+        return ex;
+    }
+
+    public Long persist(byte[] key) {
+        byte[] cacheKey = generateCacheKey("", key);
+        JedisPool pool = impl.locateJedisPool(key);
+        if (pool == null) {
+            logger.error(description("Not available JedisPool"));
+            return null;
+        }
+        Jedis jedis = null;
+        Long ok = 0L;
+        try {
+            jedis = pool.getResource();
+            if (jedis != null) {
+                ok = jedis.persist(cacheKey);
+            }
+            pool.returnResource(jedis);
+        } catch (Exception e) {
+            if (jedis != null) {
+                pool.returnBrokenResource(jedis);
+            }
+        }
+        return ok;
+
+    }
+
+    public String type(byte[] key) {
+        byte[] cacheKey = generateCacheKey("", key);
+        JedisPool pool = impl.locateJedisPool(key);
+        if (pool == null) {
+            logger.error(description("Not available JedisPool"));
+            return null;
+        }
+        String type = "";
+        Jedis jedis = null;
+        try {
+            jedis = pool.getResource();
+            if (jedis != null) {
+                type = jedis.type(cacheKey);
+            }
+            pool.returnResource(jedis);
+        } catch (Exception e) {
+            if (jedis != null) {
+                pool.returnBrokenResource(jedis);
+            }
+        }
+        return type;
+    }
+
+    public Long expire(byte[] key, int seconds) {
+        byte[] cacheKey = generateCacheKey("", key);
+        JedisPool pool = impl.locateJedisPool(key);
+        if (pool == null) {
+            logger.error(description("Not available JedisPool"));
+            return null;
+        }
+        Long on = 0L;
+        Jedis jedis = null;
+        try {
+            jedis = pool.getResource();
+            if (jedis != null) {
+                on = jedis.expire(cacheKey, seconds);
+            }
+            pool.returnResource(jedis);
+        } catch (Exception e) {
+            if (jedis != null) {
+                pool.returnBrokenResource(jedis);
+            }
+        }
+        return on;
+    }
+
+    public Long expireAt(byte[] key, long unixTime) {
+        byte[] cacheKey = generateCacheKey("", key);
+        JedisPool pool = impl.locateJedisPool(key);
+        if (pool == null) {
+            logger.error(description("Not available JedisPool"));
+            return null;
+        }
+        Long on = 0L;
+        Jedis jedis = null;
+        try {
+            jedis = pool.getResource();
+            if (jedis != null) {
+                on = jedis.expireAt(cacheKey, unixTime);
+            }
+            pool.returnResource(jedis);
+        } catch (Exception e) {
+            if (jedis != null) {
+                pool.returnBrokenResource(jedis);
+            }
+        }
+        return on;
+    }
+
+    public Long ttl(byte[] key) {
+        byte[] cacheKey = generateCacheKey("", key);
+        JedisPool pool = impl.locateJedisPool(key);
+        if (pool == null) {
+            logger.error(description("Not available JedisPool"));
+            return null;
+        }
+        Long ttl = 0L;
+        Jedis jedis = null;
+        try {
+            jedis = pool.getResource();
+            if (jedis != null) {
+                ttl = jedis.ttl(cacheKey);
+            }
+            pool.returnResource(jedis);
+        } catch (Exception e) {
+            if (jedis != null) {
+                pool.returnBrokenResource(jedis);
+            }
+        }
+        return ttl;
+    }
+
+    public String setex(byte[] key, int seconds, byte[] value) {
+        byte[] cacheKey = generateCacheKey("", key);
+        JedisPool pool = impl.locateJedisPool(key);
+        if (pool == null) {
+            logger.error(description("Not available JedisPool"));
+            return null;
+        }
+        String ok = "";
+        Jedis jedis = null;
+        try {
+            jedis = pool.getResource();
+            if (jedis != null) {
+                ok = jedis.setex(cacheKey, seconds, value);
+            }
+            pool.returnResource(jedis);
+        } catch (Exception e) {
+            if (jedis != null) {
+                pool.returnBrokenResource(jedis);
+            }
+        }
+        return ok;
+    }
+
+    public Boolean setbit(byte[] key, long offset, boolean value) {
+        byte[] cacheKey = generateCacheKey("", key);
+        JedisPool pool = impl.locateJedisPool(key);
+        if (pool == null) {
+            logger.error(description("Not available JedisPool"));
+            return null;
+        }
+        Boolean origin = false;
+        Jedis jedis = null;
+        try {
+            jedis = pool.getResource();
+            if (jedis != null) {
+                origin = jedis.setbit(cacheKey, offset, value);
+            }
+            pool.returnResource(jedis);
+        } catch (Exception e) {
+            if (jedis != null) {
+                pool.returnBrokenResource(jedis);
+            }
+        }
+        return origin;
+    }
+
+    public Boolean setbit(byte[] key, long offset, byte[] value) {
+        byte[] cacheKey = generateCacheKey("", key);
+        JedisPool pool = impl.locateJedisPool(key);
+        if (pool == null) {
+            logger.error(description("Not available JedisPool"));
+            return null;
+        }
+        Boolean origin = false;
+        Jedis jedis = null;
+        try {
+            jedis = pool.getResource();
+            if (jedis != null) {
+                origin = jedis.setbit(cacheKey, offset, value);
+            }
+            pool.returnResource(jedis);
+        } catch (Exception e) {
+            if (jedis != null) {
+                pool.returnBrokenResource(jedis);
+            }
+        }
+        return origin;
+    }
+
+    public Boolean getbit(byte[] key, long offset) {
+        byte[] cacheKey = generateCacheKey("", key);
+        JedisPool pool = impl.locateJedisPool(key);
+        if (pool == null) {
+            logger.error(description("Not available JedisPool"));
+            return null;
+        }
+        Boolean bt = false;
+        Jedis jedis = null;
+        try {
+            jedis = pool.getResource();
+            if (jedis != null) {
+                bt = jedis.getbit(cacheKey, offset);
+            }
+            pool.returnResource(jedis);
+        } catch (Exception e) {
+            if (jedis != null) {
+                pool.returnBrokenResource(jedis);
+            }
+        }
+        return bt;
+    }
+
+    public Long setrange(byte[] key, long offset, byte[] value) {
+        byte[] cacheKey = generateCacheKey("", key);
+        JedisPool pool = impl.locateJedisPool(key);
+        if (pool == null) {
+            logger.error(description("Not available JedisPool"));
+            return null;
+        }
+        Long len = 0L;
+        Jedis jedis = null;
+        try {
+            jedis = pool.getResource();
+            if (jedis != null) {
+                len = jedis.setrange(cacheKey, offset, value);
+            }
+            pool.returnResource(jedis);
+        } catch (Exception e) {
+            if (jedis != null) {
+                pool.returnBrokenResource(jedis);
+            }
+        }
+        return len;
+    }
+
+    public byte[] getrange(byte[] key, long startOffset, long endOffset) {
+        byte[] cacheKey = generateCacheKey("", key);
+        JedisPool pool = impl.locateJedisPool(key);
+        if (pool == null) {
+            logger.error(description("Not available JedisPool"));
+            return null;
+        }
+        byte[] value = null;
+        Jedis jedis = null;
+        try {
+            jedis = pool.getResource();
+            if (jedis != null) {
+                value = jedis.getrange(cacheKey, startOffset, endOffset);
+            }
+            pool.returnResource(jedis);
+        } catch (Exception e) {
+            if (jedis != null) {
+                pool.returnBrokenResource(jedis);
+            }
+        }
+        return value;
+    }
+
+    public byte[] getSet(byte[] key, byte[] value) {
+        byte[] cacheKey = generateCacheKey("", key);
+        JedisPool pool = impl.locateJedisPool(key);
+        if (pool == null) {
+            logger.error(description("Not available JedisPool"));
+            return null;
+        }
+        byte[] pre = null;
+        Jedis jedis = null;
+        try {
+            jedis = pool.getResource();
+            if (jedis != null) {
+                pre = jedis.getSet(cacheKey, value);
+            }
+            pool.returnResource(jedis);
+        } catch (Exception e) {
+            if (jedis != null) {
+                pool.returnBrokenResource(jedis);
+            }
+        }
+        return pre;
+    }
+
+    public Long setnx(byte[] key, byte[] value) {
+        byte[] cacheKey = generateCacheKey("", key);
+        JedisPool pool = impl.locateJedisPool(key);
+        if (pool == null) {
+            logger.error(description("Not available JedisPool"));
+            return null;
+        }
+        Long ok = 0L;
+        Jedis jedis = null;
+        try {
+            jedis = pool.getResource();
+            if (jedis != null) {
+                ok = jedis.setnx(cacheKey, value);
+            }
+            pool.returnResource(jedis);
+        } catch (Exception e) {
+            if (jedis != null) {
+                pool.returnBrokenResource(jedis);
+            }
+        }
+        return ok;
+    }
+
+    public Long decrBy(byte[] key, long step) {
+        byte[] cacheKey = generateCacheKey("", key);
+        JedisPool pool = impl.locateJedisPool(key);
+        if (pool == null) {
+            logger.error(description("Not available JedisPool"));
+            return null;
+        }
+        Jedis jedis = null;
+        Long value = null;
+        try {
+            jedis = pool.getResource();
+            if (jedis != null) {
+                value = jedis.decrBy(cacheKey, step);
+            }
+            pool.returnResource(jedis);
+        } catch (Exception e) {
+            if (jedis != null) {
+                pool.returnBrokenResource(jedis);
+            }
+        }
+        return value;
+    }
+
+    public Long decr(byte[] key) {
+        byte[] cacheKey = generateCacheKey("", key);
+        JedisPool pool = impl.locateJedisPool(key);
+        if (pool == null) {
+            logger.error(description("Not available JedisPool"));
+            return null;
+        }
+        Jedis jedis = null;
+        Long value = null;
+        try {
+            jedis = pool.getResource();
+            if (jedis != null) {
+                value = jedis.decr(cacheKey);
+            }
+            pool.returnResource(jedis);
+        } catch (Exception e) {
+            if (jedis != null) {
+                pool.returnBrokenResource(jedis);
+            }
+        }
+        return value;
+    }
+
+    public Long incrBy(byte[] key, long step) {
+        byte[] cacheKey = generateCacheKey("", key);
+        JedisPool pool = impl.locateJedisPool(key);
+        if (pool == null) {
+            logger.error(description("Not available JedisPool"));
+            return null;
+        }
+        Jedis jedis = null;
+        Long v = 0L;
+        try {
+            jedis = pool.getResource();
+            if (jedis != null) {
+                v = jedis.incrBy(cacheKey, step);
+            }
+            pool.returnResource(jedis);
+        } catch (Exception e) {
+            if (jedis != null) {
+                pool.returnBrokenResource(jedis);
+            }
+        }
+        return v;
+    }
+
+    public Long incr(byte[] key) {
+        byte[] cacheKey = generateCacheKey("", key);
+        JedisPool pool = impl.locateJedisPool(key);
+        if (pool == null) {
+            logger.error(description("Not available JedisPool"));
+            return null;
+        }
+        Jedis jedis = null;
+        Long v = 0L;
+        try {
+            jedis = pool.getResource();
+            if (jedis != null) {
+                v = jedis.incr(cacheKey);
+            }
+            pool.returnResource(jedis);
+        } catch (Exception e) {
+            if (jedis != null) {
+                pool.returnBrokenResource(jedis);
+            }
+        }
+        return v;
+    }
+
+    public Long append(byte[] key, byte[] value) {
+        byte[] cacheKey = generateCacheKey("", key);
+        JedisPool pool = impl.locateJedisPool(key);
+        if (pool == null) {
+            logger.error(description("Not available JedisPool"));
+            return null;
+        }
+        Long len = 0L;
+        Jedis jedis = null;
+        try {
+            jedis = pool.getResource();
+            if (jedis != null) {
+                len = jedis.append(cacheKey, value);
+            }
+            pool.returnResource(jedis);
+        } catch (Exception e) {
+            if (jedis != null) {
+                pool.returnBrokenResource(jedis);
+            }
+        }
+        return len;
+    }
+
+    public Long del(byte[] key) {
+        byte[] cacheKey = generateCacheKey("", key);
+        JedisPool pool = impl.locateJedisPool(key);
+        if (pool == null) {
+            logger.error(description("Not available JedisPool"));
+            return null;
+        }
+        Long removedSize = 0L;
+        Jedis jedis = null;
+        try {
+            jedis = pool.getResource();
+            if (jedis != null) {
+                removedSize = jedis.del(cacheKey);
+            }
+            pool.returnResource(jedis);
+        } catch (Exception e) {
+            if (jedis != null) {
+                pool.returnBrokenResource(jedis);
+            }
+        }
+        return removedSize;
+    }
+
+    /* binary commands end */
 
     @Override
     public Long append(String key, String value) {
@@ -479,12 +1017,12 @@ public class Sedis implements JedisCommands {
             logger.error(description("Not available JedisPool"));
             return null;
         }
-        String ok = "";
+        String pre = "";
         Jedis jedis = null;
         try {
             jedis = pool.getResource();
             if (jedis != null) {
-                ok = jedis.getSet(cacheKey, value);
+                pre = jedis.getSet(cacheKey, value);
             }
             pool.returnResource(jedis);
         } catch (Exception e) {
@@ -492,7 +1030,7 @@ public class Sedis implements JedisCommands {
                 pool.returnBrokenResource(jedis);
             }
         }
-        return ok;
+        return pre;
     }
 
     @Override
@@ -2455,4 +2993,27 @@ public class Sedis implements JedisCommands {
         }
         return score;
     }
+
+    /*
+    public static void main(String[] args) {
+        BasicConfigurator.configure();
+        Sedis sedis = new Sedis("dba_test_rw", "13a76724");
+        byte[] key = new byte[] { 'm', 'y' };
+        byte[] value = new byte[] { 'v', 'x', 'y', 'z', 'v' };
+        System.out.println(sedis.setex(key, 100, value));
+        System.out.println(sedis.set(key, value));
+        System.out.println(Arrays.toString(sedis.get(key)));
+        System.out.println(sedis.exists(key));
+        System.out.println(sedis.ttl(key));
+        System.out.println(sedis.persist(key));
+        System.out.println(sedis.ttl(key));
+        System.out.println(sedis.type(key));
+        System.out.println(sedis.expire(key, 100));
+        System.out.println(sedis.ttl(key));
+        System.out.println(sedis.expireAt(key, System.currentTimeMillis() + 2000));
+        System.out.println(sedis.ttl(key));
+        System.out.println(sedis.del(key));
+        System.out.println(sedis.exists(key));
+    }
+    */
 }
