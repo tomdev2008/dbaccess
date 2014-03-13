@@ -20,6 +20,7 @@ import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.SortingParams;
 import redis.clients.jedis.Tuple;
 
+import com.qunar.redis.storage.exception.CacheException;
 import com.qunar.redis.util.Continuum;
 import com.qunar.zkclient.ZkClient;
 import com.qunar.zkclient.exception.ZkException;
@@ -224,6 +225,7 @@ public class Sedis implements JedisCommands {
             if (jedis != null) {
                 pool.returnBrokenResource(jedis);
             }
+            throw new CacheException(e);
         }
         return value;
     }
@@ -247,6 +249,7 @@ public class Sedis implements JedisCommands {
             if (jedis != null) {
                 pool.returnBrokenResource(jedis);
             }
+            throw new CacheException(e);
         }
         return ok;
 
@@ -271,6 +274,7 @@ public class Sedis implements JedisCommands {
             if (jedis != null) {
                 pool.returnBrokenResource(jedis);
             }
+            throw new CacheException(e);
         }
         return ex;
     }
@@ -294,6 +298,7 @@ public class Sedis implements JedisCommands {
             if (jedis != null) {
                 pool.returnBrokenResource(jedis);
             }
+            throw new CacheException(e);
         }
         return ok;
 
@@ -318,6 +323,7 @@ public class Sedis implements JedisCommands {
             if (jedis != null) {
                 pool.returnBrokenResource(jedis);
             }
+            throw new CacheException(e);
         }
         return type;
     }
@@ -341,6 +347,7 @@ public class Sedis implements JedisCommands {
             if (jedis != null) {
                 pool.returnBrokenResource(jedis);
             }
+            throw new CacheException(e);
         }
         return on;
     }
@@ -364,6 +371,7 @@ public class Sedis implements JedisCommands {
             if (jedis != null) {
                 pool.returnBrokenResource(jedis);
             }
+            throw new CacheException(e);
         }
         return on;
     }
@@ -387,6 +395,7 @@ public class Sedis implements JedisCommands {
             if (jedis != null) {
                 pool.returnBrokenResource(jedis);
             }
+            throw new CacheException(e);
         }
         return ttl;
     }
@@ -410,6 +419,7 @@ public class Sedis implements JedisCommands {
             if (jedis != null) {
                 pool.returnBrokenResource(jedis);
             }
+            throw new CacheException(e);
         }
         return ok;
     }
@@ -433,6 +443,7 @@ public class Sedis implements JedisCommands {
             if (jedis != null) {
                 pool.returnBrokenResource(jedis);
             }
+            throw new CacheException(e);
         }
         return origin;
     }
@@ -456,6 +467,7 @@ public class Sedis implements JedisCommands {
             if (jedis != null) {
                 pool.returnBrokenResource(jedis);
             }
+            throw new CacheException(e);
         }
         return origin;
     }
@@ -479,6 +491,7 @@ public class Sedis implements JedisCommands {
             if (jedis != null) {
                 pool.returnBrokenResource(jedis);
             }
+            throw new CacheException(e);
         }
         return bt;
     }
@@ -502,6 +515,7 @@ public class Sedis implements JedisCommands {
             if (jedis != null) {
                 pool.returnBrokenResource(jedis);
             }
+            throw new CacheException(e);
         }
         return len;
     }
@@ -525,6 +539,7 @@ public class Sedis implements JedisCommands {
             if (jedis != null) {
                 pool.returnBrokenResource(jedis);
             }
+            throw new CacheException(e);
         }
         return value;
     }
@@ -548,6 +563,7 @@ public class Sedis implements JedisCommands {
             if (jedis != null) {
                 pool.returnBrokenResource(jedis);
             }
+            throw new CacheException(e);
         }
         return pre;
     }
@@ -571,6 +587,7 @@ public class Sedis implements JedisCommands {
             if (jedis != null) {
                 pool.returnBrokenResource(jedis);
             }
+            throw new CacheException(e);
         }
         return ok;
     }
@@ -594,6 +611,7 @@ public class Sedis implements JedisCommands {
             if (jedis != null) {
                 pool.returnBrokenResource(jedis);
             }
+            throw new CacheException(e);
         }
         return value;
     }
@@ -617,6 +635,7 @@ public class Sedis implements JedisCommands {
             if (jedis != null) {
                 pool.returnBrokenResource(jedis);
             }
+            throw new CacheException(e);
         }
         return value;
     }
@@ -640,6 +659,7 @@ public class Sedis implements JedisCommands {
             if (jedis != null) {
                 pool.returnBrokenResource(jedis);
             }
+            throw new CacheException(e);
         }
         return v;
     }
@@ -663,6 +683,7 @@ public class Sedis implements JedisCommands {
             if (jedis != null) {
                 pool.returnBrokenResource(jedis);
             }
+            throw new CacheException(e);
         }
         return v;
     }
@@ -686,6 +707,7 @@ public class Sedis implements JedisCommands {
             if (jedis != null) {
                 pool.returnBrokenResource(jedis);
             }
+            throw new CacheException(e);
         }
         return len;
     }
@@ -709,6 +731,7 @@ public class Sedis implements JedisCommands {
             if (jedis != null) {
                 pool.returnBrokenResource(jedis);
             }
+            throw new CacheException(e);
         }
         return removedSize;
     }
@@ -735,6 +758,7 @@ public class Sedis implements JedisCommands {
             if (jedis != null) {
                 pool.returnBrokenResource(jedis);
             }
+            throw new CacheException(e);
         }
         return len;
     }
@@ -759,6 +783,7 @@ public class Sedis implements JedisCommands {
             if (jedis != null) {
                 pool.returnBrokenResource(jedis);
             }
+            throw new CacheException(e);
         }
         return count;
     }
@@ -783,6 +808,7 @@ public class Sedis implements JedisCommands {
             if (jedis != null) {
                 pool.returnBrokenResource(jedis);
             }
+            throw new CacheException(e);
         }
         return count;
     }
@@ -807,6 +833,7 @@ public class Sedis implements JedisCommands {
             if (jedis != null) {
                 pool.returnBrokenResource(jedis);
             }
+            throw new CacheException(e);
         }
         return list;
     }
@@ -831,6 +858,7 @@ public class Sedis implements JedisCommands {
             if (jedis != null) {
                 pool.returnBrokenResource(jedis);
             }
+            throw new CacheException(e);
         }
         return list;
     }
@@ -855,6 +883,7 @@ public class Sedis implements JedisCommands {
             if (jedis != null) {
                 pool.returnBrokenResource(jedis);
             }
+            throw new CacheException(e);
         }
         return value;
     }
@@ -879,6 +908,7 @@ public class Sedis implements JedisCommands {
             if (jedis != null) {
                 pool.returnBrokenResource(jedis);
             }
+            throw new CacheException(e);
         }
         return value;
     }
@@ -903,6 +933,7 @@ public class Sedis implements JedisCommands {
             if (jedis != null) {
                 pool.returnBrokenResource(jedis);
             }
+            throw new CacheException(e);
         }
         return removedSize;
     }
@@ -933,6 +964,7 @@ public class Sedis implements JedisCommands {
             if (jedis != null) {
                 pool.returnBrokenResource(jedis);
             }
+            throw new CacheException(e);
         }
         return ex;
     }
@@ -957,6 +989,7 @@ public class Sedis implements JedisCommands {
             if (jedis != null) {
                 pool.returnBrokenResource(jedis);
             }
+            throw new CacheException(e);
         }
         return on;
     }
@@ -981,6 +1014,7 @@ public class Sedis implements JedisCommands {
             if (jedis != null) {
                 pool.returnBrokenResource(jedis);
             }
+            throw new CacheException(e);
         }
         return on;
     }
@@ -1005,6 +1039,7 @@ public class Sedis implements JedisCommands {
             if (jedis != null) {
                 pool.returnBrokenResource(jedis);
             }
+            throw new CacheException(e);
         }
         return value;
     }
@@ -1029,6 +1064,7 @@ public class Sedis implements JedisCommands {
             if (jedis != null) {
                 pool.returnBrokenResource(jedis);
             }
+            throw new CacheException(e);
         }
         return pre;
     }
@@ -1053,6 +1089,7 @@ public class Sedis implements JedisCommands {
             if (jedis != null) {
                 pool.returnBrokenResource(jedis);
             }
+            throw new CacheException(e);
         }
         return bt;
     }
@@ -1077,6 +1114,7 @@ public class Sedis implements JedisCommands {
             if (jedis != null) {
                 pool.returnBrokenResource(jedis);
             }
+            throw new CacheException(e);
         }
         return value;
     }
@@ -1101,6 +1139,7 @@ public class Sedis implements JedisCommands {
             if (jedis != null) {
                 pool.returnBrokenResource(jedis);
             }
+            throw new CacheException(e);
         }
         return removedSize;
     }
@@ -1125,6 +1164,7 @@ public class Sedis implements JedisCommands {
             if (jedis != null) {
                 pool.returnBrokenResource(jedis);
             }
+            throw new CacheException(e);
         }
         return ex;
     }
@@ -1149,6 +1189,7 @@ public class Sedis implements JedisCommands {
             if (jedis != null) {
                 pool.returnBrokenResource(jedis);
             }
+            throw new CacheException(e);
         }
         return value;
     }
@@ -1179,6 +1220,7 @@ public class Sedis implements JedisCommands {
             if (jedis != null) {
                 pool.returnBrokenResource(jedis);
             }
+            throw new CacheException(e);
         }
         return v;
     }
@@ -1203,6 +1245,7 @@ public class Sedis implements JedisCommands {
             if (jedis != null) {
                 pool.returnBrokenResource(jedis);
             }
+            throw new CacheException(e);
         }
         return keys;
     }
@@ -1227,6 +1270,7 @@ public class Sedis implements JedisCommands {
             if (jedis != null) {
                 pool.returnBrokenResource(jedis);
             }
+            throw new CacheException(e);
         }
         return len;
     }
@@ -1251,6 +1295,7 @@ public class Sedis implements JedisCommands {
             if (jedis != null) {
                 pool.returnBrokenResource(jedis);
             }
+            throw new CacheException(e);
         }
         return values;
     }
@@ -1275,6 +1320,7 @@ public class Sedis implements JedisCommands {
             if (jedis != null) {
                 pool.returnBrokenResource(jedis);
             }
+            throw new CacheException(e);
         }
         return ok;
     }
@@ -1299,6 +1345,7 @@ public class Sedis implements JedisCommands {
             if (jedis != null) {
                 pool.returnBrokenResource(jedis);
             }
+            throw new CacheException(e);
         }
         return ok;
     }
@@ -1323,6 +1370,7 @@ public class Sedis implements JedisCommands {
             if (jedis != null) {
                 pool.returnBrokenResource(jedis);
             }
+            throw new CacheException(e);
         }
         return ok;
     }
@@ -1347,6 +1395,7 @@ public class Sedis implements JedisCommands {
             if (jedis != null) {
                 pool.returnBrokenResource(jedis);
             }
+            throw new CacheException(e);
         }
         return values;
     }
@@ -1371,6 +1420,7 @@ public class Sedis implements JedisCommands {
             if (jedis != null) {
                 pool.returnBrokenResource(jedis);
             }
+            throw new CacheException(e);
         }
         return v;
     }
@@ -1395,6 +1445,7 @@ public class Sedis implements JedisCommands {
             if (jedis != null) {
                 pool.returnBrokenResource(jedis);
             }
+            throw new CacheException(e);
         }
         return v;
     }
@@ -1419,6 +1470,7 @@ public class Sedis implements JedisCommands {
             if (jedis != null) {
                 pool.returnBrokenResource(jedis);
             }
+            throw new CacheException(e);
         }
         return value;
     }
@@ -1443,6 +1495,7 @@ public class Sedis implements JedisCommands {
             if (jedis != null) {
                 pool.returnBrokenResource(jedis);
             }
+            throw new CacheException(e);
         }
         return len;
     }
@@ -1467,6 +1520,7 @@ public class Sedis implements JedisCommands {
             if (jedis != null) {
                 pool.returnBrokenResource(jedis);
             }
+            throw new CacheException(e);
         }
         return len;
     }
@@ -1491,6 +1545,7 @@ public class Sedis implements JedisCommands {
             if (jedis != null) {
                 pool.returnBrokenResource(jedis);
             }
+            throw new CacheException(e);
         }
         return value;
     }
@@ -1515,6 +1570,7 @@ public class Sedis implements JedisCommands {
             if (jedis != null) {
                 pool.returnBrokenResource(jedis);
             }
+            throw new CacheException(e);
         }
         return len;
     }
@@ -1539,6 +1595,7 @@ public class Sedis implements JedisCommands {
             if (jedis != null) {
                 pool.returnBrokenResource(jedis);
             }
+            throw new CacheException(e);
         }
         return len;
     }
@@ -1563,6 +1620,7 @@ public class Sedis implements JedisCommands {
             if (jedis != null) {
                 pool.returnBrokenResource(jedis);
             }
+            throw new CacheException(e);
         }
         return values;
     }
@@ -1587,6 +1645,7 @@ public class Sedis implements JedisCommands {
             if (jedis != null) {
                 pool.returnBrokenResource(jedis);
             }
+            throw new CacheException(e);
         }
         return removed;
     }
@@ -1611,6 +1670,7 @@ public class Sedis implements JedisCommands {
             if (jedis != null) {
                 pool.returnBrokenResource(jedis);
             }
+            throw new CacheException(e);
         }
         return ok;
     }
@@ -1635,6 +1695,7 @@ public class Sedis implements JedisCommands {
             if (jedis != null) {
                 pool.returnBrokenResource(jedis);
             }
+            throw new CacheException(e);
         }
         return ok;
     }
@@ -1665,6 +1726,7 @@ public class Sedis implements JedisCommands {
             if (jedis != null) {
                 pool.returnBrokenResource(jedis);
             }
+            throw new CacheException(e);
         }
         return ok;
     }
@@ -1689,6 +1751,7 @@ public class Sedis implements JedisCommands {
             if (jedis != null) {
                 pool.returnBrokenResource(jedis);
             }
+            throw new CacheException(e);
         }
         return value;
     }
@@ -1713,6 +1776,7 @@ public class Sedis implements JedisCommands {
             if (jedis != null) {
                 pool.returnBrokenResource(jedis);
             }
+            throw new CacheException(e);
         }
         return len;
     }
@@ -1737,6 +1801,7 @@ public class Sedis implements JedisCommands {
             if (jedis != null) {
                 pool.returnBrokenResource(jedis);
             }
+            throw new CacheException(e);
         }
         return len;
     }
@@ -1761,6 +1826,7 @@ public class Sedis implements JedisCommands {
             if (jedis != null) {
                 pool.returnBrokenResource(jedis);
             }
+            throw new CacheException(e);
         }
         return addSize;
     }
@@ -1785,6 +1851,7 @@ public class Sedis implements JedisCommands {
             if (jedis != null) {
                 pool.returnBrokenResource(jedis);
             }
+            throw new CacheException(e);
         }
         return size;
     }
@@ -1809,6 +1876,7 @@ public class Sedis implements JedisCommands {
             if (jedis != null) {
                 pool.returnBrokenResource(jedis);
             }
+            throw new CacheException(e);
         }
         return ok;
     }
@@ -1833,6 +1901,7 @@ public class Sedis implements JedisCommands {
             if (jedis != null) {
                 pool.returnBrokenResource(jedis);
             }
+            throw new CacheException(e);
         }
         return origin;
     }
@@ -1857,6 +1926,7 @@ public class Sedis implements JedisCommands {
             if (jedis != null) {
                 pool.returnBrokenResource(jedis);
             }
+            throw new CacheException(e);
         }
         return origin;
     }
@@ -1881,6 +1951,7 @@ public class Sedis implements JedisCommands {
             if (jedis != null) {
                 pool.returnBrokenResource(jedis);
             }
+            throw new CacheException(e);
         }
         return ok;
     }
@@ -1905,6 +1976,7 @@ public class Sedis implements JedisCommands {
             if (jedis != null) {
                 pool.returnBrokenResource(jedis);
             }
+            throw new CacheException(e);
         }
         return ok;
     }
@@ -1929,6 +2001,7 @@ public class Sedis implements JedisCommands {
             if (jedis != null) {
                 pool.returnBrokenResource(jedis);
             }
+            throw new CacheException(e);
         }
         return len;
     }
@@ -1953,6 +2026,7 @@ public class Sedis implements JedisCommands {
             if (jedis != null) {
                 pool.returnBrokenResource(jedis);
             }
+            throw new CacheException(e);
         }
         return ok;
     }
@@ -1977,6 +2051,7 @@ public class Sedis implements JedisCommands {
             if (jedis != null) {
                 pool.returnBrokenResource(jedis);
             }
+            throw new CacheException(e);
         }
         return members;
     }
@@ -2001,6 +2076,7 @@ public class Sedis implements JedisCommands {
             if (jedis != null) {
                 pool.returnBrokenResource(jedis);
             }
+            throw new CacheException(e);
         }
         return sorted;
     }
@@ -2025,6 +2101,7 @@ public class Sedis implements JedisCommands {
             if (jedis != null) {
                 pool.returnBrokenResource(jedis);
             }
+            throw new CacheException(e);
         }
         return sorted;
     }
@@ -2049,6 +2126,7 @@ public class Sedis implements JedisCommands {
             if (jedis != null) {
                 pool.returnBrokenResource(jedis);
             }
+            throw new CacheException(e);
         }
         return value;
     }
@@ -2073,6 +2151,7 @@ public class Sedis implements JedisCommands {
             if (jedis != null) {
                 pool.returnBrokenResource(jedis);
             }
+            throw new CacheException(e);
         }
         return value;
     }
@@ -2097,6 +2176,7 @@ public class Sedis implements JedisCommands {
             if (jedis != null) {
                 pool.returnBrokenResource(jedis);
             }
+            throw new CacheException(e);
         }
         return removed;
     }
@@ -2121,6 +2201,7 @@ public class Sedis implements JedisCommands {
             if (jedis != null) {
                 pool.returnBrokenResource(jedis);
             }
+            throw new CacheException(e);
         }
         return len;
     }
@@ -2145,6 +2226,7 @@ public class Sedis implements JedisCommands {
             if (jedis != null) {
                 pool.returnBrokenResource(jedis);
             }
+            throw new CacheException(e);
         }
         return sub;
     }
@@ -2169,6 +2251,7 @@ public class Sedis implements JedisCommands {
             if (jedis != null) {
                 pool.returnBrokenResource(jedis);
             }
+            throw new CacheException(e);
         }
         return ttl;
     }
@@ -2193,6 +2276,7 @@ public class Sedis implements JedisCommands {
             if (jedis != null) {
                 pool.returnBrokenResource(jedis);
             }
+            throw new CacheException(e);
         }
         return type;
     }
@@ -2217,6 +2301,7 @@ public class Sedis implements JedisCommands {
             if (jedis != null) {
                 pool.returnBrokenResource(jedis);
             }
+            throw new CacheException(e);
         }
         return added;
     }
@@ -2241,6 +2326,7 @@ public class Sedis implements JedisCommands {
             if (jedis != null) {
                 pool.returnBrokenResource(jedis);
             }
+            throw new CacheException(e);
         }
         return added;
     }
@@ -2265,6 +2351,7 @@ public class Sedis implements JedisCommands {
             if (jedis != null) {
                 pool.returnBrokenResource(jedis);
             }
+            throw new CacheException(e);
         }
         return len;
     }
@@ -2289,6 +2376,7 @@ public class Sedis implements JedisCommands {
             if (jedis != null) {
                 pool.returnBrokenResource(jedis);
             }
+            throw new CacheException(e);
         }
         return count;
     }
@@ -2313,6 +2401,7 @@ public class Sedis implements JedisCommands {
             if (jedis != null) {
                 pool.returnBrokenResource(jedis);
             }
+            throw new CacheException(e);
         }
         return count;
     }
@@ -2337,6 +2426,7 @@ public class Sedis implements JedisCommands {
             if (jedis != null) {
                 pool.returnBrokenResource(jedis);
             }
+            throw new CacheException(e);
         }
         return ns;
 
@@ -2362,6 +2452,7 @@ public class Sedis implements JedisCommands {
             if (jedis != null) {
                 pool.returnBrokenResource(jedis);
             }
+            throw new CacheException(e);
         }
         return range;
     }
@@ -2386,6 +2477,7 @@ public class Sedis implements JedisCommands {
             if (jedis != null) {
                 pool.returnBrokenResource(jedis);
             }
+            throw new CacheException(e);
         }
         return range;
     }
@@ -2410,6 +2502,7 @@ public class Sedis implements JedisCommands {
             if (jedis != null) {
                 pool.returnBrokenResource(jedis);
             }
+            throw new CacheException(e);
         }
         return range;
     }
@@ -2434,6 +2527,7 @@ public class Sedis implements JedisCommands {
             if (jedis != null) {
                 pool.returnBrokenResource(jedis);
             }
+            throw new CacheException(e);
         }
         return range;
     }
@@ -2458,6 +2552,7 @@ public class Sedis implements JedisCommands {
             if (jedis != null) {
                 pool.returnBrokenResource(jedis);
             }
+            throw new CacheException(e);
         }
         return range;
     }
@@ -2482,6 +2577,7 @@ public class Sedis implements JedisCommands {
             if (jedis != null) {
                 pool.returnBrokenResource(jedis);
             }
+            throw new CacheException(e);
         }
         return range;
     }
@@ -2506,6 +2602,7 @@ public class Sedis implements JedisCommands {
             if (jedis != null) {
                 pool.returnBrokenResource(jedis);
             }
+            throw new CacheException(e);
         }
         return range;
     }
@@ -2531,6 +2628,7 @@ public class Sedis implements JedisCommands {
             if (jedis != null) {
                 pool.returnBrokenResource(jedis);
             }
+            throw new CacheException(e);
         }
         return range;
     }
@@ -2556,6 +2654,7 @@ public class Sedis implements JedisCommands {
             if (jedis != null) {
                 pool.returnBrokenResource(jedis);
             }
+            throw new CacheException(e);
         }
         return range;
     }
@@ -2580,6 +2679,7 @@ public class Sedis implements JedisCommands {
             if (jedis != null) {
                 pool.returnBrokenResource(jedis);
             }
+            throw new CacheException(e);
         }
         return range;
     }
@@ -2604,6 +2704,7 @@ public class Sedis implements JedisCommands {
             if (jedis != null) {
                 pool.returnBrokenResource(jedis);
             }
+            throw new CacheException(e);
         }
         return rank;
     }
@@ -2628,6 +2729,7 @@ public class Sedis implements JedisCommands {
             if (jedis != null) {
                 pool.returnBrokenResource(jedis);
             }
+            throw new CacheException(e);
         }
         return removed;
     }
@@ -2652,6 +2754,7 @@ public class Sedis implements JedisCommands {
             if (jedis != null) {
                 pool.returnBrokenResource(jedis);
             }
+            throw new CacheException(e);
         }
         return removed;
     }
@@ -2676,6 +2779,7 @@ public class Sedis implements JedisCommands {
             if (jedis != null) {
                 pool.returnBrokenResource(jedis);
             }
+            throw new CacheException(e);
         }
         return removed;
     }
@@ -2700,6 +2804,7 @@ public class Sedis implements JedisCommands {
             if (jedis != null) {
                 pool.returnBrokenResource(jedis);
             }
+            throw new CacheException(e);
         }
         return removed;
     }
@@ -2724,6 +2829,7 @@ public class Sedis implements JedisCommands {
             if (jedis != null) {
                 pool.returnBrokenResource(jedis);
             }
+            throw new CacheException(e);
         }
         return range;
     }
@@ -2748,6 +2854,7 @@ public class Sedis implements JedisCommands {
             if (jedis != null) {
                 pool.returnBrokenResource(jedis);
             }
+            throw new CacheException(e);
         }
         return range;
     }
@@ -2772,6 +2879,7 @@ public class Sedis implements JedisCommands {
             if (jedis != null) {
                 pool.returnBrokenResource(jedis);
             }
+            throw new CacheException(e);
         }
         return range;
     }
@@ -2796,6 +2904,7 @@ public class Sedis implements JedisCommands {
             if (jedis != null) {
                 pool.returnBrokenResource(jedis);
             }
+            throw new CacheException(e);
         }
         return range;
     }
@@ -2820,6 +2929,7 @@ public class Sedis implements JedisCommands {
             if (jedis != null) {
                 pool.returnBrokenResource(jedis);
             }
+            throw new CacheException(e);
         }
         return range;
     }
@@ -2844,6 +2954,7 @@ public class Sedis implements JedisCommands {
             if (jedis != null) {
                 pool.returnBrokenResource(jedis);
             }
+            throw new CacheException(e);
         }
         return range;
     }
@@ -2868,6 +2979,7 @@ public class Sedis implements JedisCommands {
             if (jedis != null) {
                 pool.returnBrokenResource(jedis);
             }
+            throw new CacheException(e);
         }
         return range;
     }
@@ -2893,6 +3005,7 @@ public class Sedis implements JedisCommands {
             if (jedis != null) {
                 pool.returnBrokenResource(jedis);
             }
+            throw new CacheException(e);
         }
         return range;
     }
@@ -2918,6 +3031,7 @@ public class Sedis implements JedisCommands {
             if (jedis != null) {
                 pool.returnBrokenResource(jedis);
             }
+            throw new CacheException(e);
         }
         return range;
     }
@@ -2942,6 +3056,7 @@ public class Sedis implements JedisCommands {
             if (jedis != null) {
                 pool.returnBrokenResource(jedis);
             }
+            throw new CacheException(e);
         }
         return range;
     }
@@ -2966,6 +3081,7 @@ public class Sedis implements JedisCommands {
             if (jedis != null) {
                 pool.returnBrokenResource(jedis);
             }
+            throw new CacheException(e);
         }
         return rank;
     }
@@ -2990,6 +3106,7 @@ public class Sedis implements JedisCommands {
             if (jedis != null) {
                 pool.returnBrokenResource(jedis);
             }
+            throw new CacheException(e);
         }
         return score;
     }

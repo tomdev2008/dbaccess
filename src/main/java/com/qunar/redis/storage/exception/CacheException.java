@@ -6,7 +6,7 @@ package com.qunar.redis.storage.exception;
  * @author michael
  * @email liyong19861014@gmail.com
  */
-public class CacheException extends Exception {
+public class CacheException extends RuntimeException {
 
     private static final long serialVersionUID = 1L;
 
