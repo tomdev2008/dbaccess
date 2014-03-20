@@ -13,7 +13,7 @@
 	<groupId>com.qunar.db</groupId>
 	<artifactId>dbaccess</artifactId>
 	<packaging>jar</packaging>
-	<version>1.2.0</version>
+	<version>1.2.1</version>
 	<name>dbaccess</name>
 	<developers>
 		<developer>
