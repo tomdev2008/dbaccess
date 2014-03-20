@@ -6,8 +6,6 @@ import java.util.regex.Pattern;
 
 import javax.sql.DataSource;
 
-import org.json.JSONException;
-import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -125,22 +123,19 @@ public class Entry {
 
     @Override
     public String toString() {
-        JSONObject json = new JSONObject();
-        try {
-            json.put("host", host);
-            json.put("port", port);
-            json.put("user", user);
-            json.put("password", "******");
-            json.put("flag", rwFlag);
-            json.put("pattern", pattern);
-            json.put("db_name", dbName);
-            json.put("coreSize", coreSize);
-            json.put("maxSize", maxSize);
-            json.put("dataSource", dataSource.toString());
-        } catch (JSONException e) {
-            logger.error(e.getMessage(), e);
-        }
-        return json.toString();
+        StringBuffer sb = new StringBuffer();
+        sb.append("(");
+        sb.append("host=").append(host).append(", ");
+        sb.append("port=").append(port).append(", ");
+        sb.append("user=").append(user).append(", ");
+        sb.append("password=").append("******").append(", ");
+        sb.append("flag=").append(rwFlag).append(", ");
+        sb.append("pattern=").append(pattern).append(", ");
+        sb.append("dbName=").append(dbName).append(", ");
+        sb.append("coreSize=").append(coreSize).append(", ");
+        sb.append("maxSize=").append(maxSize).append(", ");
+        sb.append("dataSource=").append(dataSource.toString());
+        sb.append(")");
+        return sb.toString();
     }
-
 }
