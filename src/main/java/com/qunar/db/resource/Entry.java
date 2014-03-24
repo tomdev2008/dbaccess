@@ -6,15 +6,9 @@ import java.util.regex.Pattern;
 
 import javax.sql.DataSource;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.jolbox.bonecp.BoneCPDataSource;
-import com.qunar.db.util.DbLogger;
 
 public class Entry {
-
-    private static final Logger logger = LoggerFactory.getLogger(DbLogger.class);
 
     private String host;
 
