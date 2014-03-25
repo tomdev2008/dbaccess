@@ -28,12 +28,12 @@ public class SedisTrxWrapper implements Closeable {
         return jedis.multi();
     }
 
-    public String watch(final String... keys) {
-        return jedis.watch(keys);
+    public String watch(final String key) {
+        return jedis.watch(key);
     }
 
-    public String watch(final byte[]... keys) {
-        return jedis.watch(keys);
+    public String watch(final byte[] key) {
+        return jedis.watch(key);
     }
 
     public String unwatch() {
