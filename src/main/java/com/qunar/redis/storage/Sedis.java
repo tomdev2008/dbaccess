@@ -67,7 +67,7 @@ public class Sedis implements JedisCommands {
         return sb.toString();
     }
 
-    private class Impl extends NodeDataListener {
+    class Impl extends NodeDataListener {
 
         private Continuum continuum;
 
@@ -3432,26 +3432,78 @@ public class Sedis implements JedisCommands {
         return score;
     }
 
+    /* transaction commands start */
+
+    public SedisTrxWrapper getWrapperForTransaction(String key) {
+        JedisPool pool = impl.locateJedisPool(key);
+        if (pool == null) {
+            logger.error(description("Not available JedisPool"));
+            return null;
+        }
+        try {
+            Jedis jedis = pool.getResource();
+            if (jedis != null) {
+                return new SedisTrxWrapper(jedis, pool);
+            }
+        } catch (Exception e) {
+            throw new CacheException(e);
+        }
+        return null;
+    }
+
+    /* transaction commands end */
+
     /*
     public static void main(String[] args) {
         BasicConfigurator.configure();
         Sedis sedis = new Sedis("dba_test_rw", "13a76724");
-        byte[] key = new byte[] { 'm', 'y' };
-        byte[] value = new byte[] { 'v', 'x', 'y', 'z', 'v' };
-        System.out.println(sedis.setex(key, 100, value));
-        System.out.println(sedis.set(key, value));
-        System.out.println(Arrays.toString(sedis.get(key)));
-        System.out.println(sedis.exists(key));
-        System.out.println(sedis.ttl(key));
-        System.out.println(sedis.persist(key));
-        System.out.println(sedis.ttl(key));
-        System.out.println(sedis.type(key));
-        System.out.println(sedis.expire(key, 100));
-        System.out.println(sedis.ttl(key));
-        System.out.println(sedis.expireAt(key, System.currentTimeMillis() + 2000));
-        System.out.println(sedis.ttl(key));
-        System.out.println(sedis.del(key));
-        System.out.println(sedis.exists(key));
+        String key = "llmykey";
+        //        String value = "llvalue";
+        int loop = 20;
+        for (int i = 0; i < loop; ++i) {
+            SedisWrapper wrapper = null;
+            try {
+                wrapper = sedis.getWrapperForTransaction(key);
+                Transaction trac = wrapper.multi();
+                trac.incr(key);
+                trac.incr(key);
+                trac.exec();
+                logger.debug(String.format("key:%s, value:%s", key, sedis.get(key)));
+            } finally {
+                if (wrapper != null) {
+                    try {
+                        wrapper.close();
+                    } catch (Exception e) {
+                        logger.error(e.getMessage(), e);
+                    }
+                }
+            }
+            try {
+                TimeUnit.SECONDS.sleep(1);
+            } catch (InterruptedException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+        }
+
+        //        BasicConfigurator.configure();
+        //        Sedis sedis = new Sedis("dba_test_rw", "13a76724");
+        //        byte[] key = new byte[] { 'm', 'y' };
+        //        byte[] value = new byte[] { 'v', 'x', 'y', 'z', 'v' };
+        //        System.out.println(sedis.setex(key, 100, value));
+        //        System.out.println(sedis.set(key, value));
+        //        System.out.println(Arrays.toString(sedis.get(key)));
+        //        System.out.println(sedis.exists(key));
+        //        System.out.println(sedis.ttl(key));
+        //        System.out.println(sedis.persist(key));
+        //        System.out.println(sedis.ttl(key));
+        //        System.out.println(sedis.type(key));
+        //        System.out.println(sedis.expire(key, 100));
+        //        System.out.println(sedis.ttl(key));
+        //        System.out.println(sedis.expireAt(key, System.currentTimeMillis() + 2000));
+        //        System.out.println(sedis.ttl(key));
+        //        System.out.println(sedis.del(key));
+        //        System.out.println(sedis.exists(key));
     }
     */
 }
